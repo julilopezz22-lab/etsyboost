@@ -8,11 +8,10 @@ exports.handler = async (event) => {
     'Content-Type': 'application/json'
   };
 
-  // Generate code verifier and challenge for PKCE
   const crypto = require('crypto');
   const codeVerifier = crypto.randomBytes(32).toString('base64url');
   const codeChallenge = crypto.createHash('sha256').update(codeVerifier).digest('base64url');
-  const state = crypto.randomBytes(16).toString('hex');
+  const state = codeVerifier;
 
   const authUrl = `https://www.etsy.com/oauth/connect?` +
     `response_type=code` +
@@ -26,10 +25,6 @@ exports.handler = async (event) => {
   return {
     statusCode: 200,
     headers,
-    body: JSON.stringify({ 
-      authUrl, 
-      codeVerifier,
-      state 
-    })
+    body: JSON.stringify({ authUrl })
   };
 };
