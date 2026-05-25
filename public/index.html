@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EtsyBoost — Live Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0a;--bg2:#111;--bg3:#181818;--bg4:#1f1f1f;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --text:#f0f0f0;--text2:#777;--text3:#3a3a3a;
+  --green:#1dbd6e;--green-dim:rgba(29,189,110,0.1);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.1);
+  --red:#ff4f4f;--red-dim:rgba(255,79,79,0.1);
+  --accent:#1dbd6e;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;min-height:100vh;}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:8px;}
+.logo-ico{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.logo-txt{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.logo-txt span{color:var(--accent);}
+.status-pill{display:flex;align-items:center;gap:6px;font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--border2);}
+.status-dot{width:7px;height:7px;border-radius:50%;}
+.dot-live{background:var(--green);animation:pulse 2s infinite;}
+.dot-off{background:var(--text3);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.main{max-width:1100px;margin:0 auto;padding:24px 16px;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.stat .sl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;font-weight:600;}
+.stat .sv{font-size:22px;font-weight:700;font-family:'DM Mono',monospace;}
+.stat .ss{font-size:10px;color:var(--text2);margin-top:3px;}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.fchip{font-size:11px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.fchip.active{background:var(--green-dim);border-color:var(--accent);color:var(--green);}
+.listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.lcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .15s;}
+.lcard:hover{border-color:var(--border2);}
+.limg{width:100%;height:180px;object-fit:cover;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--text3);}
+.limg img{width:100%;height:100%;object-fit:cover;}
+.lbody{padding:12px;}
+.ltitle{font-size:12px;font-weight:500;line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.lmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.lprice{font-size:14px;font-weight:600;font-family:'DM Mono',monospace;color:var(--green);}
+.lviews{font-size:10px;color:var(--text3);}
+.ltags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.ltag{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+.ltag.bad{background:var(--red-dim);color:var(--red);border-color:rgba(255,79,79,.3);}
+.ltag.warn{background:var(--amber-dim);color:var(--amber);border-color:rgba(245,166,35,.3);}
+.lscore-row{display:flex;align-items:center;justify-content:space-between;}
+.sbadge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:8px;font-family:'DM Mono',monospace;}
+.sg{background:var(--green-dim);color:var(--green);}
+.sa{background:var(--amber-dim);color:var(--amber);}
+.sr{background:var(--red-dim);color:var(--red);}
+.opt-btn{font-size:10px;font-weight:500;padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.opt-btn:hover{background:var(--accent);color:#000;border-color:var(--accent);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:580px;max-height:88vh;overflow-y:auto;}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;}
+.mclose{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-size:16px;padding:4px 10px;}
+.mbody{padding:20px;}
+.msec{margin-bottom:18px;}
+.mlbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+.mtitle{font-size:13px;font-weight:500;line-height:1.5;color:var(--text);background:var(--bg3);border-radius:8px;padding:10px;}
+.mtags{display:flex;flex-wrap:wrap;gap:5px;}
+.mtag{font-size:11px;padding:4px 10px;border-radius:20px;}
+.missues{display:flex;flex-direction:column;gap:6px;}
+.miss{display:flex;gap:8px;align-items:flex-start;background:var(--bg3);border-radius:8px;padding:9px 10px;font-size:12px;line-height:1.5;}
+.miss.error{background:var(--red-dim);}
+.miss.warning{background:var(--amber-dim);}
+.miss.success{background:var(--green-dim);}
+.opt-title-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;line-height:1.6;color:var(--text2);margin-bottom:8px;}
+.cbtn{width:100%;background:var(--accent);border:none;border-radius:8px;color:#000;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s;margin-bottom:8px;}
+.cbtn:hover{opacity:.85;}
+.cbtn.secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2);}
+.nano-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;}
+.nano-lbl{font-size:10px;color:var(--accent);font-weight:600;text-transform:uppercase;margin-bottom:6px;}
+.nano-txt{font-size:11px;color:var(--text2);line-height:1.6;font-style:italic;}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.pcell{background:var(--bg3);border-radius:8px;padding:10px;text-align:center;}
+.pcell .pl{font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;}
+.pcell .pv{font-size:18px;font-weight:600;font-family:'DM Mono',monospace;}
+.pcell.ideal .pv{color:var(--green);}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:12px;}
+.spin{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-size:13px;color:var(--text2);}
+.pagination{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:20px;}
+.page-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;}
+.page-btn:hover:not(:disabled){background:var(--accent);color:#000;border-color:var(--accent);}
+.page-btn:disabled{opacity:.3;cursor:not-allowed;}
+.page-info{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+@media(max-width:600px){.listings-grid{grid-template-columns:1fr 1fr;}.limg{height:140px;}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-ico">🌸</div>
+    <div class="logo-txt">Etsy<span>Boost</span></div>
+  </div>
+  <div class="status-pill" id="status-pill">
+    <div class="status-dot dot-off" id="sdot"></div>
+    <span id="stxt">Connecting...</span>
+  </div>
+</div>
+
+<div class="main">
+  <div id="loading-section" class="loading"><div class="spin"></div><p>Loading your listings from Etsy...</p></div>
+  <div id="dashboard" style="display:none">
+    <div class="stats-row" id="stats-row"></div>
+    <div class="filters" id="filters">
+      <button class="fchip active" data-f="all">All Listings</button>
+      <button class="fchip" data-f="needs-work">🔴 Needs Work</button>
+      <button class="fchip" data-f="good">🟡 Good</button>
+      <button class="fchip" data-f="great">🟢 Great</button>
+      <button class="fchip" data-f="no-tags">⚠️ Missing Tags</button>
+    </div>
+    <div class="listings-grid" id="listings-grid"></div>
+    <div class="pagination" id="pagination" style="display:none">
+      <button class="page-btn" id="prev-btn" disabled>← Prev</button>
+      <span class="page-info" id="page-info"></span>
+      <button class="page-btn" id="next-btn">Next →</button>
+    </div>
+  </div>
+  <div id="error-section" style="display:none;padding:40px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:12px">⚠️</div>
+    <div style="font-size:16px;font-weight:600;margin-bottom:8px" id="err-title">Connection Error</div>
+    <div style="font-size:13px;color:var(--text2)" id="err-msg"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">Listing Analysis</div>
+      <button class="mclose" id="mclose">✕</button>
+    </div>
+    <div class="mbody" id="mbody"></div>
+  </div>
+</div>
+
+<script>
+const SHOP = 'julietshopp';
+let allListings = [];
+let filteredListings = [];
+let currentPage = 0;
+const PAGE_SIZE = 25;
+let totalCount = 0;
+
+// Rules
+function analyzeTitle(t) {
+  const issues=[]; let score=100;
+  if(!t) return {issues,score:0};
+  const len=t.length;
+  if(len<80){issues.push({type:'error',icon:'📏',msg:`Too short: ${len}/140 chars. Missing ${140-len} free SEO characters.`});score-=35;}
+  else if(len<100){issues.push({type:'warning',icon:'📏',msg:`Could be longer: ${len}/140 chars.`});score-=15;}
+  const words=t.toLowerCase().replace(/[,\-–:]/g,' ').split(/\s+/).filter(w=>w.length>3);
+  const wc={};words.forEach(w=>{wc[w]=(wc[w]||0)+1;});
+  const dups=Object.entries(wc).filter(([,c])=>c>1).map(([w])=>w);
+  if(dups.length){issues.push({type:'error',icon:'🔁',msg:`Repeated words: "${dups.join('", "')}". Etsy ignores duplicates.`});score-=20*dups.length;}
+  if(!issues.length) issues.push({type:'success',icon:'✅',msg:'Title looks great!'});
+  return {issues,score:Math.max(0,score)};
+}
+
+function analyzeTags(tags,title) {
+  const issues=[]; let score=100;
+  const badSet=new Set(); const warnSet=new Set();
+  if(!tags||!tags.length) return {issues:[{type:'warning',icon:'🏷️',msg:'No tags found.'}],score:50,badSet,warnSet};
+  if(tags.length<13){issues.push({type:'error',icon:'🏷️',msg:`Only ${tags.length}/13 tags. Add ${13-tags.length} more.`});score-=(13-tags.length)*6;}
+  const tw=new Set((title||'').toLowerCase().replace(/[,\-–:]/g,' ').split(/\s+/).filter(w=>w.length>4));
+  const typos={'neckace':1,'neckla':1,'earings':1,'jewlery':1,'botannical':1};
+  tags.forEach(tag=>{
+    if(tag.length>20){issues.push({type:'error',icon:'⚠️',msg:`"${tag}" is ${tag.length} chars — max 20.`});score-=10;badSet.add(tag);}
+    if(Object.keys(typos).some(t=>tag.toLowerCase().includes(t))){issues.push({type:'error',icon:'✏️',msg:`"${tag}" may have a typo.`});score-=12;badSet.add(tag);}
+    const tagW=tag.toLowerCase().split(/\s+/).filter(w=>w.length>4);
+    if(tagW.length&&tagW.every(w=>tw.has(w))){issues.push({type:'warning',icon:'🔁',msg:`"${tag}" repeats title keywords.`});score-=8;warnSet.add(tag);}
+  });
+  if(!issues.length) issues.push({type:'success',icon:'✅',msg:'All tags look valid!'});
+  return {issues,score:Math.max(0,score),badSet,warnSet};
+}
+
+function analyzePrice(price,type) {
+  const ranges={necklace:79,earrings:65,ring:70,bracelet:60,default:65};
+  const ideal=ranges[type]||ranges.default;
+  const p=parseFloat((price||'').replace(/[^0-9.]/g,''));
+  if(isNaN(p)) return {score:70,current:0,ideal};
+  return {score:p<ideal-15?75:100,current:p,ideal};
+}
+
+function detectType(title) {
+  const t=(title||'').toLowerCase();
+  if(t.includes('earring')||t.includes('stud')) return 'earrings';
+  if(t.includes('necklace')||t.includes('choker')||t.includes('pendant')) return 'necklace';
+  if(t.includes('ring')) return 'ring';
+  if(t.includes('bracelet')) return 'bracelet';
+  return 'default';
+}
+
+function overall(tS,gS,pS){return Math.round(tS*.4+gS*.4+pS*.2);}
+function scClass(n){return n>=75?'sg':n>=50?'sa':'sr';}
+
+function nanoBanana(type) {
+  const p={
+    necklace:"Change background to soft white marble. Add gentle shadow beneath necklace. Enhance translucent flower petal detail. Soft warm studio lighting from upper left. Make pearls more luminous. Keep flower colors natural.",
+    earrings:"Change background to soft white linen. Soften lighting to be diffused. Enhance petal colors and resin clarity. Add gentle shadow beneath earrings. Remove harsh reflections. Make hooks look polished.",
+    default:"Change background to soft white marble or linen. Add gentle shadow. Enhance product colors and resin clarity. Soft diffused studio lighting. Remove harsh reflections."
+  };
+  return p[type]||p.default;
+}
+
+function optTitle(type) {
+  const t={
+    necklace:"Real Flower Necklace, Preserved Botanical Pendant, Bridal Jewelry, Handmade Gift for Her, Floral Necklace",
+    earrings:"Real Flower Earrings, Botanical Dangle Earrings, Handmade Resin Jewelry, Floral Gift for Her",
+    default:"Real Flower Resin Jewelry, Preserved Botanical Pendant, Handmade Nature Jewelry, Floral Gift for Her"
+  };
+  return t[type]||t.default;
+}
+
+function scoreListings(listings) {
+  return listings.map(l=>{
+    const type=detectType(l.title);
+    const tR=analyzeTitle(l.title);
+    const gR=analyzeTags(l.tags||[],l.title);
+    const price=l.price?(l.price.amount/l.price.divisor).toFixed(2):'0';
+    const pR=analyzePrice('$'+price,type);
+    l._score=overall(tR.score,gR.score,pR.score);
+    l._price=price;
+    l._type=type;
+    return l;
+  });
+}
+
+function renderStats(listings) {
+  const total=listings.length;
+  const needsWork=listings.filter(l=>l._score<50).length;
+  const totalViews=listings.reduce((s,l)=>s+(l.views||0),0);
+  const avgPrice=total?(listings.reduce((s,l)=>s+parseFloat(l._price||0),0)/total).toFixed(2):0;
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat"><div class="sl">Listings Loaded</div><div class="sv">${total}</div><div class="ss">of ${totalCount} total active</div></div>
+    <div class="stat"><div class="sl">Need Optimization</div><div class="sv" style="color:var(--red)">${needsWork}</div><div class="ss">Score below 50</div></div>
+    <div class="stat"><div class="sl">Total Views</div><div class="sv">${totalViews.toLocaleString()}</div><div class="ss">All loaded listings</div></div>
+    <div class="stat"><div class="sl">Avg Price</div><div class="sv" style="color:var(--green)">$${avgPrice}</div><div class="ss">Across all listings</div></div>
+  `;
+}
+
+function renderGrid(listings) {
+  const grid=document.getElementById('listings-grid');
+  if(!listings.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">No listings match this filter.</div>`;
+    return;
+  }
+  grid.innerHTML=listings.map(l=>{
+    const imgUrl=l.primary_image?.url_570xN||l.images?.[0]?.url_570xN||'';
+    const tags=(l.tags||[]).slice(0,4);
+    const gR=analyzeTags(l.tags||[],l.title);
+    const badSet=gR.badSet||new Set();
+    const warnSet=gR.warnSet||new Set();
+    return `
+    <div class="lcard" data-id="${l.listing_id}">
+      <div class="limg">${imgUrl?`<img src="${imgUrl}" alt="" loading="lazy">`:'🌸'}</div>
+      <div class="lbody">
+        <div class="ltitle">${l.title||'No title'}</div>
+        <div class="lmeta">
+          <span class="lprice">$${l._price}</span>
+          <span class="lviews">${l.views||0} views</span>
+        </div>
+        <div class="ltags">
+          ${tags.map(t=>`<span class="ltag ${badSet.has(t)?'bad':warnSet.has(t)?'warn':''}">${t}</span>`).join('')}
+          ${(l.tags||[]).length>4?`<span class="ltag">+${(l.tags||[]).length-4}</span>`:''}
+          ${!(l.tags||[]).length?`<span class="ltag bad">No tags</span>`:''}
+        </div>
+        <div class="lscore-row">
+          <span class="sbadge ${scClass(l._score)}">${l._score}/100</span>
+          <button class="opt-btn" data-id="${l.listing_id}">Analyze ↗</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('[data-id]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const id=el.dataset.id;
+      const listing=allListings.find(l=>l.listing_id==id);
+      if(listing) openModal(listing);
+    });
+  });
+}
+
+function applyFilter(f) {
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.toggle('active',c.dataset.f===f));
+  let filtered=[...allListings];
+  if(f==='needs-work') filtered=filtered.filter(l=>l._score<50);
+  else if(f==='good') filtered=filtered.filter(l=>l._score>=50&&l._score<75);
+  else if(f==='great') filtered=filtered.filter(l=>l._score>=75);
+  else if(f==='no-tags') filtered=filtered.filter(l=>!l.tags||l.tags.length<13);
+  filteredListings=filtered;
+  renderGrid(filtered);
+}
+
+function openModal(l) {
+  const type=l._type||detectType(l.title);
+  const tR=analyzeTitle(l.title);
+  const gR=analyzeTags(l.tags||[],l.title);
+  const pR=analyzePrice('$'+l._price,type);
+  const score=overall(tR.score,gR.score,pR.score);
+  const badSet=gR.badSet||new Set();
+  const warnSet=gR.warnSet||new Set();
+  const ot=optTitle(type);
+  const nb=nanoBanana(type);
+
+  document.getElementById('mbody').innerHTML=`
+    <div class="msec">
+      <div class="mlbl">OVERALL SCORE</div>
+      <span class="sbadge ${scClass(score)}" style="font-size:18px;padding:6px 14px">${score}/100</span>
+    </div>
+    <div class="msec">
+      <div class="mlbl">TITLE (${(l.title||'').length}/140 chars)</div>
+      <div class="mtitle">${l.title||'No title'}</div>
+      <div class="missues" style="margin-top:8px">
+        ${tR.issues.map(i=>`<div class="miss ${i.type}"><span>${i.icon}</span><span>${i.msg}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="msec">
+      <div class="mlbl">TAGS (${(l.tags||[]).length}/13)</div>
+      <div class="mtags" style="margin-bottom:8px">
+        ${(l.tags||[]).map(t=>`<span class="mtag ltag ${badSet.has(t)?'bad':warnSet.has(t)?'warn':''}">${t} <span style="opacity:.5;font-size:9px">${t.length}</span></span>`).join('')}
+        ${!(l.tags||[]).length?`<span style="color:var(--red);font-size:12px">No tags found</span>`:''}
+      </div>
+      <div class="missues">
+        ${gR.issues.map(i=>`<div class="miss ${i.type}"><span>${i.icon}</span><span>${i.msg}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="msec">
+      <div class="mlbl">PRICE ANALYSIS</div>
+      <div class="pgrid">
+        <div class="pcell"><div class="pl">Your Price</div><div class="pv" style="color:${pR.current<pR.ideal-10?'var(--red)':'var(--text)'}">$${pR.current}</div></div>
+        <div class="pcell ideal"><div class="pl">Suggested</div><div class="pv">$${pR.ideal}</div></div>
+        <div class="pcell"><div class="pl">You Gain</div><div class="pv" style="color:var(--green)">+$${Math.max(0,pR.ideal-pR.current).toFixed(0)}</div></div>
+      </div>
+    </div>
+    <div class="msec">
+      <div class="mlbl">OPTIMIZED TITLE</div>
+      <div class="opt-title-box">${ot}</div>
+      <button class="cbtn" id="copy-ot">📋 Copy optimized title</button>
+    </div>
+    <div class="msec">
+      <div class="mlbl">NANO BANANA PROMPT</div>
+      <div class="nano-box"><div class="nano-lbl">✨ Copy & paste into Gemini</div><div class="nano-txt">${nb}</div></div>
+      <button class="cbtn secondary" id="copy-nb">📋 Copy Nano Banana prompt</button>
+    </div>
+  `;
+
+  document.getElementById('copy-ot').onclick=()=>{
+    navigator.clipboard.writeText(ot).then(()=>{
+      document.getElementById('copy-ot').textContent='✓ Copied!';
+      setTimeout(()=>{document.getElementById('copy-ot').innerHTML='📋 Copy optimized title';},2000);
+    });
+  };
+  document.getElementById('copy-nb').onclick=()=>{
+    navigator.clipboard.writeText(nb).then(()=>{
+      document.getElementById('copy-nb').textContent='✓ Copied!';
+      setTimeout(()=>{document.getElementById('copy-nb').innerHTML='📋 Copy Nano Banana prompt';},2000);
+    });
+  };
+
+  document.getElementById('modal').classList.add('open');
+}
+
+async function loadListings(offset=0) {
+  try {
+    const res=await fetch(`/api/etsy-listings?shop=${SHOP}&limit=25&offset=${offset}`);
+    if(!res.ok){
+      const err=await res.json();
+      throw new Error(err.error||`HTTP ${res.status}`);
+    }
+    const data=await res.json();
+    return data;
+  } catch(e) {
+    throw e;
+  }
+}
+
+async function init() {
+  try {
+    const data=await loadListings(0);
+    totalCount=data.count||0;
+    allListings=scoreListings(data.results||[]);
+    filteredListings=[...allListings];
+
+    document.getElementById('loading-section').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    document.getElementById('sdot').className='status-dot dot-live';
+    document.getElementById('stxt').textContent=`Live — ${SHOP} (${totalCount} listings)`;
+
+    renderStats(allListings);
+    renderGrid(allListings);
+
+    // Pagination if more listings
+    if(totalCount>25) {
+      document.getElementById('pagination').style.display='flex';
+      document.getElementById('page-info').textContent=`Showing 1-25 of ${totalCount}`;
+    }
+
+  } catch(e) {
+    document.getElementById('loading-section').style.display='none';
+    document.getElementById('error-section').style.display='block';
+    document.getElementById('err-title').textContent='Could not connect to Etsy';
+    document.getElementById('err-msg').textContent=e.message+' — Make sure the Netlify function is deployed correctly.';
+    document.getElementById('sdot').className='status-dot dot-off';
+    document.getElementById('stxt').textContent='Connection failed';
+  }
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  init();
+  document.getElementById('mclose').onclick=()=>document.getElementById('modal').classList.remove('open');
+  document.getElementById('modal').onclick=(e)=>{if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');};
+  document.querySelectorAll('.fchip').forEach(btn=>btn.addEventListener('click',()=>applyFilter(btn.dataset.f)));
+});
+</script>
+</body>
+</html>
