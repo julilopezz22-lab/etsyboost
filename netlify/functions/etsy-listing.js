@@ -1,5 +1,5 @@
 // EtsyBoost - Single listing details with tags
-const ETSY_API_KEY = process.env.ETSY_API_KEY || 'a6hs9rn9rx9t4dyja72xwmpc';
+const ETSY_API_KEY = process.env.ETSY_API_KEY;
 
 exports.handler = async (event, context) => {
   const headers = {
