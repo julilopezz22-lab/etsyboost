@@ -1,11 +1,25 @@
 const API_KEY = process.env.ETSY_API_KEY;
 const SECRET = process.env.ETSY_SECRET;
 
+async function getImages(listingId) {
+  try {
+    const res = await fetch(
+      `https://openapi.etsy.com/v3/application/listings/${listingId}/images`,
+      { headers: { 'x-api-key': `${API_KEY}:${SECRET}`, 'Accept': 'application/json' } }
+    );
+    const data = await res.json();
+    return data.results || [];
+  } catch(e) {
+    return [];
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') return res.status(200).end();
   const { shop } = req.query;
   if (!shop) return res.status(400).json({ error: 'Shop required' });
+  
   try {
     const shopRes = await fetch(`https://openapi.etsy.com/v3/application/shops?shop_name=${shop}`, {
       headers: { 'x-api-key': `${API_KEY}:${SECRET}`, 'Accept': 'application/json' }
@@ -20,18 +34,14 @@ export default async function handler(req, res) {
     );
     const data = await listRes.json();
 
-    await Promise.all(data.results.map(async (listing) => {
-      try {
-        const imgRes = await fetch(
-          `https://openapi.etsy.com/v3/application/listings/${listing.listing_id}/images`,
-          { headers: { 'x-api-key': `${API_KEY}:${SECRET}`, 'Accept': 'application/json' } }
-        );
-        const imgData = await imgRes.json();
-        listing.images = imgData.results || [];
-      } catch(e) {
-        listing.images = [];
-      }
-    }));
+    // Load images in batches of 5
+    const listings = data.results || [];
+    for (let i = 0; i < listings.length; i += 5) {
+      const batch = listings.slice(i, i + 5);
+      await Promise.all(batch.map(async (listing) => {
+        listing.images = await getImages(listing.listing_id);
+      }));
+    }
 
     return res.status(200).json(data);
   } catch (e) {
