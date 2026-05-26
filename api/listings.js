@@ -17,7 +17,7 @@ async function getImages(listingId) {
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') return res.status(200).end();
-  const { shop } = req.query;
+  const { shop, offset = 0 } = req.query;
   if (!shop) return res.status(400).json({ error: 'Shop required' });
   
   try {
