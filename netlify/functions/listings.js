@@ -1,4 +1,5 @@
 const API_KEY = process.env.ETSY_API_KEY;
+const SECRET = process.env.ETSY_SECRET;
 
 exports.handler = async (event) => {
   const headers = {
@@ -14,7 +15,7 @@ exports.handler = async (event) => {
     
     const res = await fetch(url, {
       headers: {
-        'x-api-key': API_KEY,
+        'x-api-key': `${API_KEY}:${SECRET}`,
         'Accept': 'application/json'
       }
     });
@@ -26,8 +27,7 @@ exports.handler = async (event) => {
       headers, 
       body: JSON.stringify({ 
         status: res.status,
-        apiKey: API_KEY ? API_KEY.substring(0,6)+'...' : 'MISSING',
-        response: text.substring(0, 500)
+        response: text.substring(0, 1000)
       }) 
     };
 
