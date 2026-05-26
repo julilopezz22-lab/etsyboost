@@ -25,7 +25,7 @@ exports.handler = async (event) => {
     if (!shopId) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Shop not found', data: shopData }) };
 
     // Then get listings using shop ID
-    const url = `https://openapi.etsy.com/v3/application/shops/${shopId}/listings/active?limit=25&includes=Images,MainImage`;
+    const url = `https://openapi.etsy.com/v3/application/shops/${shopId}/listings/active?limit=25&includes=Images`;
     
     const res = await fetch(url, {
       headers: {
