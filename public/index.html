@@ -20,12 +20,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .dot-off{background:var(--text3);}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .main{max-width:1100px;margin:0 auto;padding:24px 16px;}
-.connect-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:48px 32px;text-align:center;}
-.connect-box h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;margin-bottom:10px;}
-.connect-box p{font-size:14px;color:var(--text2);margin-bottom:28px;line-height:1.6;max-width:400px;margin-left:auto;margin-right:auto;}
-.connect-btn{display:inline-flex;align-items:center;gap:10px;background:#F1641E;border:none;border-radius:12px;color:white;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;padding:14px 32px;cursor:pointer;transition:opacity .15s;}
-.connect-btn:hover{opacity:.88;}
-.connect-btn img{width:20px;height:20px;}
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
 .stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
 .stat .sl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;font-weight:600;}
@@ -99,24 +93,14 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   </div>
   <div class="status-pill">
     <div class="sdot dot-off" id="sdot"></div>
-    <span id="stxt">Not connected</span>
+    <span id="stxt">Loading...</span>
   </div>
 </div>
 
 <div class="main">
-  <div id="connect-section">
-    <div class="connect-box">
-      <h2>Connect to your Etsy shop</h2>
-      <p>Click below to authorize EtsyBoost to read your listings. You only need to do this once.</p>
-      <button class="connect-btn" id="connect-btn">
-        <span>🛍️</span>
-        <span>Connect with Etsy</span>
-      </button>
-    </div>
-  </div>
-  <div id="loading-section" style="display:none" class="loading">
+  <div id="loading-section" class="loading">
     <div class="spin"></div>
-    <p id="load-txt">Loading your listings...</p>
+    <p>Loading your listings from Etsy...</p>
   </div>
   <div id="dashboard" style="display:none">
     <div class="stats-row" id="stats-row"></div>
@@ -144,10 +128,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <script>
 const SHOP = 'julietshopp';
 let allListings = [];
-let token = '';
-let codeVerifier = '';
 
-// Rules
 function analyzeTitle(t){
   const issues=[]; let score=100;
   if(!t) return {issues,score:0};
@@ -161,6 +142,7 @@ function analyzeTitle(t){
   if(!issues.length) issues.push({type:'success',icon:'✅',msg:'Title looks great!'});
   return {issues,score:Math.max(0,score)};
 }
+
 function analyzeTags(tags,title){
   const issues=[]; let score=100;
   const badSet=new Set(); const warnSet=new Set();
@@ -175,6 +157,7 @@ function analyzeTags(tags,title){
   if(!issues.length) issues.push({type:'success',icon:'✅',msg:'All tags look valid!'});
   return {issues,score:Math.max(0,score),badSet,warnSet};
 }
+
 function analyzePrice(p,type){
   const ranges={necklace:79,earrings:65,ring:70,bracelet:60,default:65};
   const ideal=ranges[type]||ranges.default;
@@ -182,6 +165,7 @@ function analyzePrice(p,type){
   if(isNaN(price)) return {score:70,current:0,ideal};
   return {score:price<ideal-15?75:100,current:price,ideal};
 }
+
 function detectType(title){
   const t=(title||'').toLowerCase();
   if(t.includes('earring')||t.includes('stud')) return 'earrings';
@@ -190,14 +174,27 @@ function detectType(title){
   if(t.includes('bracelet')) return 'bracelet';
   return 'default';
 }
+
 function overall(a,b,c){return Math.round(a*.4+b*.4+c*.2);}
 function scClass(n){return n>=75?'sg':n>=50?'sa':'sr';}
+
 function nanoBanana(type){
-  const p={necklace:"Change background to soft white marble. Add gentle shadow beneath necklace. Enhance translucent flower petal detail. Soft warm studio lighting. Make pearls more luminous.",earrings:"Change background to soft white linen. Soften lighting. Enhance petal colors and resin clarity. Add gentle shadow. Remove harsh reflections.",default:"Change background to soft white marble. Add gentle shadow. Enhance product colors. Soft diffused studio lighting."};
+  const p={
+    necklace:"Change background to soft white marble. Add gentle shadow beneath necklace. Enhance translucent flower petal detail. Soft warm studio lighting from upper left. Make pearls more luminous.",
+    earrings:"Change background to soft white linen. Soften lighting to be diffused. Enhance petal colors and resin clarity. Add gentle shadow. Remove harsh reflections.",
+    ring:"Change background to soft cream marble. Add soft natural shadow. Enhance the resin clarity so the flower is clearly visible. Studio lighting from top.",
+    default:"Change background to soft white marble or linen. Add gentle shadow. Enhance product colors and resin clarity. Soft diffused studio lighting."
+  };
   return p[type]||p.default;
 }
+
 function optTitle(type){
-  const t={necklace:"Real Flower Necklace, Preserved Botanical Pendant, Bridal Jewelry, Handmade Gift for Her, Floral Necklace",earrings:"Real Flower Earrings, Botanical Dangle Earrings, Handmade Resin Jewelry, Floral Gift for Her",default:"Real Flower Resin Jewelry, Preserved Botanical Pendant, Handmade Nature Jewelry, Floral Gift for Her"};
+  const t={
+    necklace:"Real Flower Necklace, Preserved Botanical Pendant, Bridal Jewelry, Handmade Gift for Her, Floral Necklace",
+    earrings:"Real Flower Earrings, Botanical Dangle Earrings, Handmade Resin Jewelry, Floral Gift for Her",
+    ring:"Real Flower Ring, Preserved Botanical Ring, Adjustable Resin Ring, Handmade Nature Jewelry",
+    default:"Real Flower Resin Jewelry, Preserved Botanical Pendant, Handmade Nature Jewelry, Floral Gift for Her"
+  };
   return t[type]||t.default;
 }
 
@@ -219,7 +216,7 @@ function renderStats(listings){
   const tv=listings.reduce((s,l)=>s+(l.views||0),0);
   const ap=listings.length?(listings.reduce((s,l)=>s+parseFloat(l._price||0),0)/listings.length).toFixed(2):0;
   document.getElementById('stats-row').innerHTML=`
-    <div class="stat"><div class="sl">Listings</div><div class="sv">${listings.length}</div><div class="ss">From Etsy</div></div>
+    <div class="stat"><div class="sl">Total Listings</div><div class="sv">${listings.length}</div><div class="ss">Active on Etsy</div></div>
     <div class="stat"><div class="sl">Need Work</div><div class="sv" style="color:var(--red)">${nw}</div><div class="ss">Score below 50</div></div>
     <div class="stat"><div class="sl">Total Views</div><div class="sv">${tv.toLocaleString()}</div><div class="ss">All listings</div></div>
     <div class="stat"><div class="sl">Avg Price</div><div class="sv" style="color:var(--green)">$${ap}</div><div class="ss">Across listings</div></div>
@@ -313,74 +310,28 @@ function openModal(l){
   document.getElementById('modal').classList.add('open');
 }
 
-async function startAuth(){
-  const res = await fetch('/api/auth');
-  const data = await res.json();
-  codeVerifier = data.codeVerifier;
-  sessionStorage.setItem('cv', codeVerifier);
-  sessionStorage.setItem('state', data.state);
-  window.location.href = data.authUrl;
-}
-
-async function handleCallback(){
-  const params = new URLSearchParams(window.location.search);
-  const tk = params.get('token');
-  const error = params.get('error');
-  
-  if(error){
-    document.getElementById('connect-section').style.display='block';
-    return;
-  }
-  
-  if(tk){
-    token = tk;
-    sessionStorage.setItem('etsy_token', tk);
-    history.replaceState({}, '', '/');
-    await loadListings();
-  }
-}
-
 async function loadListings(){
-  document.getElementById('connect-section').style.display='none';
-  document.getElementById('loading-section').style.display='flex';
-  
   try {
-    const res = await fetch(`/api/listings?shop=${SHOP}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    const res = await fetch(`/api/listings?shop=${SHOP}`);
     const data = await res.json();
-    
-    if(!res.ok) throw new Error(data.error || 'API error');
-    
-    allListings = scoreAll(data.results || []);
+    if(!res.ok) throw new Error(data.error||'API error');
+    allListings = scoreAll(data.results||[]);
     document.getElementById('loading-section').style.display='none';
     document.getElementById('dashboard').style.display='block';
     document.getElementById('sdot').className='sdot dot-live';
-    document.getElementById('stxt').textContent=`Live — ${SHOP}`;
+    document.getElementById('stxt').textContent=`Live — ${SHOP} (${data.count} listings)`;
     renderStats(allListings);
     renderGrid(allListings);
-    
   } catch(e){
-    document.getElementById('loading-section').style.display='none';
-    document.getElementById('connect-section').style.display='block';
-    sessionStorage.removeItem('etsy_token');
+    document.getElementById('loading-section').innerHTML=`<div style="text-align:center;color:var(--red)">⚠️ Could not load listings: ${e.message}</div>`;
   }
 }
 
-document.addEventListener('DOMContentLoaded', async ()=>{
-  document.getElementById('connect-btn').addEventListener('click', startAuth);
+document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('mclose').onclick=()=>document.getElementById('modal').classList.remove('open');
   document.getElementById('modal').onclick=(e)=>{if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');};
   document.querySelectorAll('.fchip').forEach(btn=>btn.addEventListener('click',()=>applyFilter(btn.dataset.f)));
-  
-  // Check for callback or existing token
-  const params = new URLSearchParams(window.location.search);
-  if(params.get('token')){
-    await handleCallback();
-  } else {
-    const savedToken = sessionStorage.getItem('etsy_token');
-    if(savedToken){ token=savedToken; await loadListings(); }
-  }
+  loadListings();
 });
 </script>
 </body>
