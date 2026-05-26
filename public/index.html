@@ -333,9 +333,23 @@ async function loadListings(){
     document.getElementById('dashboard').style.display='block';
     document.getElementById('sdot').className='sdot dot-live';
     document.getElementById('stxt').textContent=`Live — ${SHOP} (${data.count} listings)`;
+renderStats(allListings);
+renderGrid(allListings);
+loadImagesLazily(allListings);
+
+// Load remaining pages
+const total = data.count || 0;
+for(let offset = 25; offset < total; offset += 25){
+  try{
+    const r2 = await fetch(`/api/listings?shop=${SHOP}&offset=${offset}`);
+    const d2 = await r2.json();
+    const more = scoreAll(d2.results||[]);
+    allListings = [...allListings, ...more];
     renderStats(allListings);
     renderGrid(allListings);
-    loadImagesLazily(allListings);
+    loadImagesLazily(more);
+  }catch(e){ break; }
+}
   } catch(e){
     document.getElementById('loading-section').innerHTML=`<div style="text-align:center;color:var(--red)">⚠️ Could not load listings: ${e.message}</div>`;
   }
