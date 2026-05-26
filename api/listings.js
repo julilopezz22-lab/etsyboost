@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     const shopId = shopData?.results?.[0]?.shop_id;
     if (!shopId) return res.status(404).json({ error: 'Shop not found' });
     const listRes = await fetch(
-      `https://openapi.etsy.com/v3/application/shops/${shopId}/listings/active?limit=25&includes=Images,MainImage`
+      `https://openapi.etsy.com/v3/application/shops/${shopId}/listings/active?limit=25&includes=Images,MainImage`,
       { headers: { 'x-api-key': `${API_KEY}:${SECRET}`, 'Accept': 'application/json' } }
     );
     const data = await listRes.json();
