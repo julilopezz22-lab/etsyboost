@@ -322,6 +322,7 @@ async function loadListings(){
     document.getElementById('stxt').textContent=`Live — ${SHOP} (${data.count} listings)`;
     renderStats(allListings);
     renderGrid(allListings);
+    loadImagesLazily(allListings);
   } catch(e){
     document.getElementById('loading-section').innerHTML=`<div style="text-align:center;color:var(--red)">⚠️ Could not load listings: ${e.message}</div>`;
   }
