@@ -20,9 +20,9 @@ export default async function handler(req, res) {
     );
     const data = await listRes.json();
     
-    // Add image URLs from listing IDs using Etsy's image endpoint
+    // Load images in parallel instead of sequential
     if (data.results) {
-      for (const listing of data.results) {
+      await Promise.all(data.results.map(async (listing) => {
         try {
           const imgRes = await fetch(
             `https://openapi.etsy.com/v3/application/listings/${listing.listing_id}/images`,
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
         } catch(e) {
           listing.images = [];
         }
-      }
+      }));
     }
     
     return res.status(200).json(data);
