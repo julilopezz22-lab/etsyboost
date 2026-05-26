@@ -6,13 +6,11 @@ exports.handler = async (event) => {
     'Content-Type': 'application/json'
   };
 
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
-
-  const { shop, limit = 25, offset = 0 } = event.queryStringParameters || {};
+  const { shop } = event.queryStringParameters || {};
   if (!shop) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Shop required' }) };
 
   try {
-    const url = `https://openapi.etsy.com/v3/application/shops/${shop}/listings/active?limit=${limit}&offset=${offset}&includes=Images,MainImage`;
+    const url = `https://openapi.etsy.com/v3/application/shops/${shop}/listings/active?limit=25&includes=Images,MainImage`;
     
     const res = await fetch(url, {
       headers: {
@@ -21,9 +19,17 @@ exports.handler = async (event) => {
       }
     });
 
-    const data = await res.json();
-    if (!res.ok) return { statusCode: res.status, headers, body: JSON.stringify({ error: data.error_description || 'API error' }) };
-    return { statusCode: 200, headers, body: JSON.stringify(data) };
+    const text = await res.text();
+    
+    return { 
+      statusCode: 200, 
+      headers, 
+      body: JSON.stringify({ 
+        status: res.status,
+        apiKey: API_KEY ? API_KEY.substring(0,6)+'...' : 'MISSING',
+        response: text.substring(0, 500)
+      }) 
+    };
 
   } catch (e) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
