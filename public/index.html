@@ -227,12 +227,12 @@ function renderGrid(listings){
   const grid=document.getElementById('grid');
   if(!listings.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">No listings match.</div>`;return;}
   grid.innerHTML=listings.map(l=>{
-    const img=l.images?.[0]?.url_570xN||`https://i.etsystatic.com/iap/${l.listing_id}/il_570xN.jpg`||'';
+    const img=l.images?.[0]?.url_570xN||'';
     const tags=(l.tags||[]).slice(0,4);
     const gR=analyzeTags(l.tags||[],l.title);
     const b=gR.badSet||new Set(); const w=gR.warnSet||new Set();
     return `<div class="lcard" data-id="${l.listing_id}">
-      <div class="limg">${img?`<img src="${img}" alt="" loading="lazy">`:'🌸'}</div>
+      <div class="limg" id="img-${l.listing_id}">${img?`<img src="${img}" alt="" loading="lazy">`:'🌸'}</div>
       <div class="lbody">
         <div class="ltitle">${l.title||'No title'}</div>
         <div class="lmeta"><span class="lprice">$${l._price}</span><span class="lviews">${l.views||0} views</span></div>
