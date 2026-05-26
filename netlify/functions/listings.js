@@ -11,7 +11,21 @@ exports.handler = async (event) => {
   if (!shop) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Shop required' }) };
 
   try {
-    const url = `https://openapi.etsy.com/v3/application/shops/${shop}/listings/active?limit=25&includes=Images,MainImage`;
+    // First get shop ID from shop name
+    const shopRes = await fetch(`https://openapi.etsy.com/v3/application/shops?shop_name=${shop}`, {
+      headers: {
+        'x-api-key': `${API_KEY}:${SECRET}`,
+        'Accept': 'application/json'
+      }
+    });
+
+    const shopData = await shopRes.json();
+    const shopId = shopData?.results?.[0]?.shop_id;
+
+    if (!shopId) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Shop not found', data: shopData }) };
+
+    // Then get listings using shop ID
+    const url = `https://openapi.etsy.com/v3/application/shops/${shopId}/listings/active?limit=25&includes=Images,MainImage`;
     
     const res = await fetch(url, {
       headers: {
@@ -20,16 +34,8 @@ exports.handler = async (event) => {
       }
     });
 
-    const text = await res.text();
-    
-    return { 
-      statusCode: 200, 
-      headers, 
-      body: JSON.stringify({ 
-        status: res.status,
-        response: text.substring(0, 1000)
-      }) 
-    };
+    const data = await res.json();
+    return { statusCode: 200, headers, body: JSON.stringify(data) };
 
   } catch (e) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
