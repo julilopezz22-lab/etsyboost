@@ -257,16 +257,19 @@ function renderGrid(listings){
 }
 
 async function loadImagesLazily(listings){
-  for(const l of listings){
-    if(l.images?.[0]?.url_570xN) continue;
-    try{
-      const res = await fetch(`/api/image?id=${l.listing_id}`);
-      const data = await res.json();
-      if(data.url){
-        const div = document.getElementById(`img-${l.listing_id}`);
-        if(div) div.innerHTML = `<img src="${data.url}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`;
-      }
-    }catch(e){}
+  const noImg = listings.filter(l => !l.images?.[0]?.url_570xN);
+  for(let i = 0; i < noImg.length; i += 5){
+    const batch = noImg.slice(i, i + 5);
+    await Promise.all(batch.map(async (l) => {
+      try{
+        const res = await fetch(`/api/image?id=${l.listing_id}`);
+        const data = await res.json();
+        if(data.url){
+          const div = document.getElementById(`img-${l.listing_id}`);
+          if(div) div.innerHTML = `<img src="${data.url}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`;
+        }
+      }catch(e){}
+    }));
   }
 }
   function applyFilter(f){
