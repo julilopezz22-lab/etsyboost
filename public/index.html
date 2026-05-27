@@ -1,3 +1,4 @@
+cat > /mnt/user-data/outputs/index.html << 'ENDOFFILE'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +42,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .ltags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
 .ltag{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
 .ltag.bad{background:var(--red-dim);color:var(--red);border-color:rgba(255,79,79,.3);}
-.ltag.warn{background:var(--amber-dim);color:var(--amber);border-color:rgba(245,166,35,.3);}
 .lscore{display:flex;align-items:center;justify-content:space-between;}
 .sbadge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:8px;font-family:'DM Mono',monospace;}
 .sg{background:var(--green-dim);color:var(--green);}
@@ -70,9 +70,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .pcell .pl{font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;}
 .pcell .pv{font-size:18px;font-weight:600;font-family:'DM Mono',monospace;}
 .pcell.ideal .pv{color:var(--green);}
-.cbtn{width:100%;background:var(--accent);border:none;border-radius:8px;color:#000;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s;margin-bottom:8px;}
+.cbtn{width:100%;background:var(--accent);border:none;border-radius:8px;color:#000;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s;margin-bottom:8px;text-decoration:none;}
 .cbtn:hover{opacity:.85;}
 .cbtn.sec{background:var(--bg3);color:var(--text);border:1px solid var(--border2);}
+.cbtn.edit{background:#ff6d00;color:#fff;}
 .nano-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;}
 .nano-lbl{font-size:10px;color:var(--accent);font-weight:600;text-transform:uppercase;margin-bottom:6px;}
 .nano-txt{font-size:11px;color:var(--text2);line-height:1.6;font-style:italic;}
@@ -130,29 +131,33 @@ function analyzeTitle(t){
   const issues=[]; let score=100;
   if(!t) return {issues,score:0};
   const len=t.length;
-  if(len<80){issues.push({type:'error',icon:'📏',msg:`Too short: ${len}/140. Missing ${140-len} free SEO characters.`});score-=35;}
-  else if(len<100){issues.push({type:'warning',icon:'📏',msg:`Could be longer: ${len}/140.`});score-=15;}
-  const words=t.toLowerCase().replace(/[,\-–:]/g,' ').split(/\s+/).filter(w=>w.length>3);
+  if(len<80){issues.push({type:'error',icon:'📏',msg:`Too short: ${len}/140. Add ${140-len} more characters with keywords.`});score-=35;}
+  else if(len<120){issues.push({type:'warning',icon:'📏',msg:`Good but could be longer: ${len}/140.`});score-=10;}
+  const words=t.toLowerCase().replace(/[,\-–:|]/g,' ').split(/\s+/).filter(w=>w.length>3);
   const wc={};words.forEach(w=>{wc[w]=(wc[w]||0)+1;});
   const dups=Object.entries(wc).filter(([,c])=>c>1).map(([w])=>w);
-  if(dups.length){issues.push({type:'error',icon:'🔁',msg:`Repeated: "${dups.join('", "')}". Etsy ignores duplicates.`});score-=20*dups.length;}
+  if(dups.length){issues.push({type:'error',icon:'🔁',msg:`Repeated words: "${dups.join('", "')}". Etsy ignores duplicates.`});score-=15*dups.length;}
   if(!issues.length) issues.push({type:'success',icon:'✅',msg:'Title looks great!'});
   return {issues,score:Math.max(0,score)};
 }
 
 function analyzeTags(tags,title){
   const issues=[]; let score=100;
-  const badSet=new Set(); const warnSet=new Set();
-  if(!tags||!tags.length) return {issues:[{type:'warning',icon:'🏷️',msg:'No tags found.'}],score:50,badSet,warnSet};
-  if(tags.length<13){issues.push({type:'error',icon:'🏷️',msg:`Only ${tags.length}/13 tags.`});score-=(13-tags.length)*6;}
-  const tw=new Set((title||'').toLowerCase().replace(/[,\-–:]/g,' ').split(/\s+/).filter(w=>w.length>4));
+  const badSet=new Set();
+  if(!tags||!tags.length) return {issues:[{type:'warning',icon:'🏷️',msg:'No tags found.'}],score:50,badSet};
+  if(tags.length<13){issues.push({type:'error',icon:'🏷️',msg:`Only ${tags.length}/13 tags. Missing ${13-tags.length} tags = lost SEO.`});score-=(13-tags.length)*6;}
   tags.forEach(tag=>{
-    if(tag.length>20){issues.push({type:'error',icon:'⚠️',msg:`"${tag}" is ${tag.length} chars — max 20.`});score-=10;badSet.add(tag);}
-    const tw2=tag.toLowerCase().split(/\s+/).filter(w=>w.length>4);
-    if(tw2.length&&tw2.every(w=>tw.has(w))){issues.push({type:'warning',icon:'🔁',msg:`"${tag}" repeats title keywords.`});score-=8;warnSet.add(tag);}
+    if(tag.length>20){issues.push({type:'error',icon:'⚠️',msg:`"${tag}" is ${tag.length} chars — max is 20. Etsy will reject it.`});score-=15;badSet.add(tag);}
+    if(tag.split(' ').length===1&&tag.length<8){issues.push({type:'warning',icon:'💡',msg:`"${tag}" is a single short word. Use 2-3 word phrases for better reach.`});score-=5;}
   });
-  if(!issues.length) issues.push({type:'success',icon:'✅',msg:'All tags look valid!'});
-  return {issues,score:Math.max(0,score),badSet,warnSet};
+  const hasTitleKeywords = tags.some(tag=>{
+    const tagWords=tag.toLowerCase().split(' ');
+    const titleLower=title.toLowerCase();
+    return tagWords.some(w=>w.length>4&&titleLower.includes(w));
+  });
+  if(!hasTitleKeywords){issues.push({type:'warning',icon:'🔗',msg:'No tags share keywords with your title. Add tags that match your title keywords.'});score-=10;}
+  if(!issues.length) issues.push({type:'success',icon:'✅',msg:'All tags look great!'});
+  return {issues,score:Math.max(0,score),badSet};
 }
 
 function analyzePrice(p,type){
@@ -227,14 +232,14 @@ function renderGrid(listings){
     const img=l.images?.[0]?.url_570xN||'';
     const tags=(l.tags||[]).slice(0,4);
     const gR=analyzeTags(l.tags||[],l.title);
-    const b=gR.badSet||new Set(); const w=gR.warnSet||new Set();
+    const b=gR.badSet||new Set();
     return `<div class="lcard" data-id="${l.listing_id}">
       <div class="limg" id="img-${l.listing_id}">${img?`<img src="${img}" alt="" loading="lazy">`:'🌸'}</div>
       <div class="lbody">
         <div class="ltitle">${l.title||'No title'}</div>
         <div class="lmeta"><span class="lprice">$${l._price}</span><span class="lviews">${l.views||0} views</span></div>
         <div class="ltags">
-          ${tags.map(t=>`<span class="ltag ${b.has(t)?'bad':w.has(t)?'warn':''}">${t}</span>`).join('')}
+          ${tags.map(t=>`<span class="ltag ${b.has(t)?'bad':''}">${t}</span>`).join('')}
           ${(l.tags||[]).length>4?`<span class="ltag">+${(l.tags||[]).length-4}</span>`:''}
           ${!(l.tags||[]).length?`<span class="ltag bad">No tags</span>`:''}
         </div>
@@ -286,10 +291,14 @@ function openModal(l){
   const gR=analyzeTags(l.tags||[],l.title);
   const pR=analyzePrice('$'+l._price,type);
   const score=overall(tR.score,gR.score,pR.score);
-  const b=gR.badSet||new Set(); const w=gR.warnSet||new Set();
+  const b=gR.badSet||new Set();
   const ot=optTitle(type); const nb=nanoBanana(type);
+  const editUrl=`https://www.etsy.com/your/listings/${l.listing_id}/edit`;
   document.getElementById('mbody').innerHTML=`
     <div class="msec"><div class="mlbl">SCORE</div><span class="sbadge ${scClass(score)}" style="font-size:18px;padding:6px 14px">${score}/100</span></div>
+    <div class="msec">
+      <a href="${editUrl}" target="_blank" class="cbtn edit">✏️ Edit this listing on Etsy</a>
+    </div>
     <div class="msec">
       <div class="mlbl">TITLE (${(l.title||'').length}/140)</div>
       <div class="mbox">${l.title||'No title'}</div>
@@ -297,7 +306,7 @@ function openModal(l){
     </div>
     <div class="msec">
       <div class="mlbl">TAGS (${(l.tags||[]).length}/13)</div>
-      <div class="mtags">${(l.tags||[]).map(t=>`<span class="ltag ${b.has(t)?'bad':w.has(t)?'warn':''}">${t} <span style="opacity:.5;font-size:9px">${t.length}</span></span>`).join('')}${!(l.tags||[]).length?`<span style="color:var(--red)">No tags</span>`:''}</div>
+      <div class="mtags">${(l.tags||[]).map(t=>`<span class="ltag ${b.has(t)?'bad':''}">${t} <span style="opacity:.5;font-size:9px">${t.length}</span></span>`).join('')}${!(l.tags||[]).length?`<span style="color:var(--red)">No tags</span>`:''}</div>
       <div class="miss-list">${gR.issues.map(i=>`<div class="miss ${i.type}"><span>${i.icon}</span><span>${i.msg}</span></div>`).join('')}</div>
     </div>
     <div class="msec">
@@ -362,3 +371,5 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
+ENDOFFILE
+echo "Listo — $(wc -l < /mnt/user-data/outputs/index.html) lineas"
