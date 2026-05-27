@@ -96,7 +96,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <span id="stxt">Loading...</span>
   </div>
 </div>
-
 <div class="main">
   <div id="loading-section" class="loading">
     <div class="spin"></div>
@@ -114,7 +113,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="grid" id="grid"></div>
   </div>
 </div>
-
 <div class="modal-ov" id="modal">
   <div class="modal">
     <div class="mhdr">
@@ -124,7 +122,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="mbody" id="mbody"></div>
   </div>
 </div>
-
 <script>
 const SHOP = 'julietshopp';
 let allListings = [];
@@ -272,7 +269,8 @@ async function loadImagesLazily(listings){
     }));
   }
 }
-  function applyFilter(f){
+
+function applyFilter(f){
   document.querySelectorAll('.fchip').forEach(c=>c.classList.toggle('active',c.dataset.f===f));
   let filtered=[...allListings];
   if(f==='needs-work') filtered=filtered.filter(l=>l._score<50);
@@ -336,23 +334,20 @@ async function loadListings(){
     document.getElementById('dashboard').style.display='block';
     document.getElementById('sdot').className='sdot dot-live';
     document.getElementById('stxt').textContent=`Live — ${SHOP} (${data.count} listings)`;
-renderStats(allListings);
-renderGrid(allListings);
-loadImagesLazily(allListings);
-
-// Load remaining pages
-const total = data.count || 0;
-for(let offset = 25; offset < total; offset += 25){
-  try{
-    const r2 = await fetch(`/api/listings?shop=${SHOP}&offset=${offset}`);
-    const d2 = await r2.json();
-    const more = scoreAll(d2.results||[]);
-    allListings = [...allListings, ...more];
     renderStats(allListings);
     renderGrid(allListings);
-    loadImagesLazily(more);
-  }catch(e){ break; }
-}
+    const total = data.count || 0;
+    for(let offset = 25; offset < total; offset += 25){
+      try{
+        const r2 = await fetch(`/api/listings?shop=${SHOP}&offset=${offset}`);
+        const d2 = await r2.json();
+        const more = scoreAll(d2.results||[]);
+        allListings = [...allListings, ...more];
+        renderStats(allListings);
+        renderGrid(allListings);
+      }catch(e){ break; }
+    }
+    loadImagesLazily(allListings);
   } catch(e){
     document.getElementById('loading-section').innerHTML=`<div style="text-align:center;color:var(--red)">⚠️ Could not load listings: ${e.message}</div>`;
   }
