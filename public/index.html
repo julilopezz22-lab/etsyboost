@@ -3,6 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EtsyBoost — SEO Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--bg2:#111;--bg3:#181818;--bg4:#1f1f1f;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--text:#f0f0f0;--text2:#777;--text3:#3a3a3a;--green:#1dbd6e;--green-dim:rgba(29,189,110,0.1);--amber:#f5a623;--amber-dim:rgba(245,166,35,0.1);--red:#ff4f4f;--red-dim:rgba(255,79,79,0.1);--accent:#1dbd6e;--blue:#4a9eff;--blue-dim:rgba(74,158,255,0.1);--purple:#9b59b6;--purple-dim:rgba(155,89,182,0.1);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;min-height:100vh;display:flex;}
+.sidebar{width:210px;min-width:210px;background:var(--bg2);border-right:1px solid var(--border);height:100vh;position:sticky;top:0;display:flex;flex-direction:column;overflow-y:auto;}
+.logo{display:flex;align-items:center;gap:8px;padding:16px 16px 12px;}
+.logo-ico{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.logo-txt{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.logo-txt span{color:var(--accent);}
+.nav-section{padding:8px 8px 4px;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:8px;margin:1px 6px;cursor:pointer;font-size:12px;color:var(--text2);transition:all .15s;text-decoration:none;}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:var(--green-dim);color:var(--green);}
+.nav-item .ni{font-size:14px;width:18px;text-align:center;}
+.sidebar-footer{margin-top:auto;padding:12px;border-top:1px solid var(--border);}
+.status-pill{display:flex;align-items:center;gap:6px;font-size:10px;padding:6px 10px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);}
+.status-dot{width:6px;height:6px;border-radius:50%;}
+.dot-live{background:var(--green);animation:pulse 2s infinite;}
+.dot-off{background:var(--text3);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.main-content{flex:1;min-width:0;overflow-y:auto;height:100vh;}
+.page{display:none;padding:24px;}
+.page.active{display:block;}
+.page-header{margin-bottom:20px;}
+.page-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px;}
+.page-sub{font-size:12px;color:var(--text2);}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.stat .sl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;font-weight:600;}
+.stat .sv{font-size:22px;font-weight:700;font-family:'DM Mono',monospace;}
+.stat .ss{font-size:10px;color:var(--text2);margin-top:3px;}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.fchip{font-size:11px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.fchip.active{background:var(--green-dim);border-color:var(--accent);color:var(--green);}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;flex:1;max-width:300px;}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:12px;width:100%;}
+.search-box input::placeholder{color:var(--text3);}
+.sort-sel{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;color:var(--text2);font-size:11px;cursor:pointer;outline:none;}
+.listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.lcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .15s;}
+.lcard:hover{border-color:var(--border2);}
+.limg{width:100%;height:160px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--text3);overflow:hidden;}
+.limg img{width:100%;height:100%;object-fit:cover;}
+.lbody{padding:12px;}
+.ltitle{font-size:12px;font-weight:500;line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.lmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.lprice{font-size:14px;font-weight:600;font-family:'DM Mono',monospace;color:var(--green);}
+.lviews{font-size:10px;color:var(--text3);}
+.ltags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.ltag{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+.ltag.bad{background:var(--red-dim);color:var(--red);border-color:rgba(255,79,79,.3);}
+.ltag.warn{background:var(--amber-dim);color:var(--amber);border-color:rgba(245,166,35,.3);}
+.lscore-row{display:flex;align-items:center;justify-content:space-between;}
+.sbadge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:8px;font-family:'DM Mono',monospace;}
+.sg{background:var(--green-dim);color:var(--green);}
+.sa{background:var(--amber-dim);color:var(--amber);}
+.sr{background:var(--red-dim);color:var(--red);}
+.sb{background:var(--blue-dim);color:var(--blue);}
+.opt-btn{font-size:10px;font-weight:500;padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.opt-btn:hover{background:var(--accent);color:#000;border-color:var(--accent);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:1;}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;}
+.mclose{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-size:16px;padding:4px 10px;}
+.mbody{padding:20px;}
+.msec{margin-bottom:18px;}
+.mlbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+.mtitle{font-size:13px;font-weight:500;line-height:1.5;color:var(--text);background:var(--bg3);border-radius:8px;padding:10px;}
+.mtags{display:flex;flex-wrap:wrap;gap:5px;}
+.mtag{font-size:11px;padding:4px 10px;border-radius:20px;}
+.missues{display:flex;flex-direction:column;gap:6px;}
+.miss{display:flex;gap:8px;align-items:flex-start;background:var(--bg3);border-radius:8px;padding:9px 10px;font-size:12px;line-height:1.5;}
+.miss.error{background:var(--red-dim);}
+.miss.warning{background:var(--amber-dim);}
+.miss.success{background:var(--green-dim);}
+.opt-title-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;line-height:1.6;color:var(--text2);margin-bottom:8px;}
+.cbtn{width:100%;background:var(--accent);border:none;border-radius:8px;color:#000;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s;margin-bottom:8px;}
+.cbtn:hover{opacity:.85;}
+.cbtn.secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2);}
+.nano-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;}
+.nano-lbl{font-size:10px;color:var(--accent);font-weight:600;text-transform:uppercase;margin-bottom:6px;}
+.nano-txt{font-size:11px;color:var(--text2);line-height:1.6;font-style:italic;}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.pcell{background:var(--bg3);border-radius:8px;padding:10px;text-align:center;}
+.pcell .pl{font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;}
+.pcell .pv{font-size:18px;font-weight:600;font-family:'DM Mono',monospace;}
+.pcell.ideal .pv{color:var(--green);}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:12px;}
+.spin{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-size:13px;color:var(--text2);}
+.pagination{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:20px;}
+.page-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;}
+.page-btn:hover:not(:disabled){background:var(--accent);color:#000;border-color:var(--accent);}
+.page-btn:disabled{opacity:.3;cursor:not-allowed;}
+.kw-search-wrap{display:flex;gap:10px;margin-bottom:20px;}
+.kw-input{flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:'DM Sans',sans-serif;}
+.kw-input:focus{border-color:var(--accent);}
+.kw-btn{background:var(--accent);border:none;border-radius:10px;color:#000;font-weight:700;padding:10px 20px;cursor:pointer;font-size:13px;transition:opacity .15s;white-space:nowrap;}
+.kw-btn:hover{opacity:.85;}
+.kw-table{width:100%;border-collapse:collapse;}
+.kw-table th{text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;border-bottom:1px solid var(--border);}
+.kw-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;}
+.kw-table tr:hover td{background:var(--bg3);}
+.kw-keyword{font-weight:500;color:var(--text);}
+.kw-copy{font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;}
+.kw-copy:hover{background:var(--accent);color:#000;border-color:var(--accent);}
+.vol-bar{height:4px;border-radius:2px;background:var(--bg3);margin-top:3px;}
+.vol-fill{height:100%;border-radius:2px;background:var(--accent);}
+.comp-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;}
+.trend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.trend-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .15s;}
+.trend-card:hover{border-color:var(--border2);}
+.trend-tag{font-size:14px;font-weight:600;margin-bottom:6px;}
+.trend-meta{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text2);}
+.trend-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;}
+.trend-up{background:var(--green-dim);color:var(--green);}
+.trend-hot{background:var(--red-dim);color:var(--red);}
+.trend-warm{background:var(--amber-dim);color:var(--amber);}
+.trend-cool{background:var(--blue-dim);color:var(--blue);}
+.rank-table{width:100%;border-collapse:collapse;}
+.rank-table th{text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;border-bottom:1px solid var(--border);}
+.rank-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;}
+.rank-table tr:hover td{background:var(--bg3);}
+.rank-pos{font-family:'DM Mono',monospace;font-weight:700;font-size:14px;}
+.rank-change{font-size:11px;font-weight:600;}
+.rank-up{color:var(--green);}
+.rank-down{color:var(--red);}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+.comp-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.comp-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.comp-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.comp-name{font-size:13px;font-weight:600;}
+.comp-url{font-size:11px;color:var(--blue);}
+.comp-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.comp-stat{background:var(--bg3);border-radius:8px;padding:8px;}
+.comp-stat .cs-l{font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;}
+.comp-stat .cs-v{font-size:15px;font-weight:700;font-family:'DM Mono',monospace;}
+.shop-overview{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;}
+.shop-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:8px;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;}
+.tc-tag{padding:4px 12px;border-radius:20px;font-size:11px;background:var(--bg3);border:1px solid var(--border2);cursor:pointer;transition:all .15s;}
+.tc-tag:hover{border-color:var(--accent);color:var(--green);}
+.tc-tag.size-2{font-size:12px;font-weight:500;}
+.tc-tag.size-3{font-size:14px;font-weight:600;}
+.tc-tag.size-4{font-size:16px;font-weight:700;}
+.grader-input-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
+.grader-textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;min-height:80px;}
+.grader-textarea:focus{border-color:var(--accent);}
+.grade-result{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.grade-score-circle{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;font-family:'DM Mono',monospace;margin:0 auto 16px;border:3px solid;}
+.score-great{border-color:var(--green);color:var(--green);}
+.score-good{border-color:var(--amber);color:var(--amber);}
+.score-bad{border-color:var(--red);color:var(--red);}
+.seo-meter{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:4px;}
+.seo-fill{height:100%;border-radius:4px;transition:width .5s;}
+.seo-green{background:var(--green);}
+.seo-amber{background:var(--amber);}
+.seo-red{background:var(--red);}
+.label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:11px;}
+.tags-input-wrap{display:flex;flex-wrap:wrap;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px;cursor:text;min-height:44px;}
+.tags-input-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:12px;min-width:100px;flex:1;}
+.tag-pill{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;background:var(--bg4);border:1px solid var(--border2);font-size:11px;}
+.tag-pill-rm{cursor:pointer;color:var(--text3);font-size:14px;line-height:1;}
+.tag-pill-rm:hover{color:var(--red);}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+@media(max-width:768px){.sidebar{width:56px;min-width:56px;}.sidebar .nav-item span:not(.ni){display:none;}.sidebar .nav-section{display:none;}.sidebar .logo-txt{display:none;}.shop-overview{grid-template-columns:1fr 1fr;}}
+</style>
+</head><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EtsyBoost - SEO Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -181,3 +359,90 @@ document.getElementById('comp-input').addEventListener('keydown',e=>{if(e.key===
 loadListings();
 });
 </script></body></html>
+
+<body>
+<nav class="sidebar">
+  <div class="logo"><div class="logo-ico">&#127800;</div><div class="logo-txt">Etsy<span>Boost</span></div></div>
+  <div class="nav-section">Dashboard</div>
+  <a class="nav-item active" data-page="listings" href="#"><span class="ni">&#128202;</span><span>My Listings</span></a>
+  <a class="nav-item" data-page="listing-grader" href="#"><span class="ni">&#127919;</span><span>Listing Grader</span></a>
+  <div class="nav-section">Research</div>
+  <a class="nav-item" data-page="keyword-tool" href="#"><span class="ni">&#128269;</span><span>Keyword Explorer</span></a>
+  <a class="nav-item" data-page="trending" href="#"><span class="ni">&#128293;</span><span>Trending Tags</span></a>
+  <a class="nav-item" data-page="rank-checker" href="#"><span class="ni">&#128200;</span><span>Rank Checker</span></a>
+  <div class="nav-section">Analysis</div>
+  <a class="nav-item" data-page="competitors" href="#"><span class="ni">&#129354;</span><span>Competitors</span></a>
+  <a class="nav-item" data-page="shop-analyzer" href="#"><span class="ni">&#127978;</span><span>Shop Analyzer</span></a>
+  <a class="nav-item" data-page="tag-report" href="#"><span class="ni">&#127991;</span><span>Tag Report</span></a>
+  <div class="sidebar-footer">
+    <div class="status-pill" id="status-pill">
+      <div class="status-dot dot-off" id="sdot"></div>
+      <span id="stxt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Connecting...</span>
+    </div>
+  </div>
+</nav>
+<div class="main-content">
+  <div class="page active" id="page-listings">
+    <div id="loading-section" class="loading"><div class="spin"></div><p>Loading your listings...</p></div>
+    <div id="dashboard" style="display:none">
+      <div class="page-header"><div class="page-title">My Listings</div><div class="page-sub">Analyze and optimize all your active Etsy listings</div></div>
+      <div class="stats-row" id="stats-row"></div>
+      <div class="filters" id="filters">
+        <div class="search-box"><span>&#128269;</span><input type="text" id="search-input" placeholder="Search listings..."></div>
+        <select class="sort-sel" id="sort-sel"><option value="score-low">Score: Low first</option><option value="score-high">Score: High first</option><option value="views">Most views</option><option value="price-high">Price: High</option><option value="price-low">Price: Low</option></select>
+        <button class="fchip active" data-f="all">All</button>
+        <button class="fchip" data-f="needs-work">&#128308; Needs Work</button>
+        <button class="fchip" data-f="good">&#128993; Good</button>
+        <button class="fchip" data-f="great">&#128994; Great</button>
+        <button class="fchip" data-f="no-tags">&#9888; Missing Tags</button>
+      </div>
+      <div class="listings-grid" id="listings-grid"></div>
+      <div class="pagination" id="pagination" style="display:none"><button class="page-btn" id="prev-btn" disabled>&#8592; Prev</button><span class="page-info" id="page-info"></span><button class="page-btn" id="next-btn">Next &#8594;</button></div>
+    </div>
+    <div id="error-section" style="display:none;padding:40px;text-align:center;"><div style="font-size:32px;margin-bottom:12px">&#9888;&#65039;</div><div style="font-size:16px;font-weight:600;margin-bottom:8px" id="err-title">Connection Error</div><div style="font-size:13px;color:var(--text2)" id="err-msg"></div></div>
+  </div>
+  <div class="page" id="page-listing-grader">
+    <div class="page-header"><div class="page-title">Listing Grader</div><div class="page-sub">Paste any Etsy listing title and tags to get a full SEO grade</div></div>
+    <div class="grader-input-wrap">
+      <div class="mlbl">LISTING TITLE</div>
+      <textarea class="grader-textarea" id="grader-title" placeholder="Paste your Etsy listing title here (aim for 130-140 characters)..."></textarea>
+      <div style="margin-top:12px;margin-bottom:6px"><div class="mlbl">TAGS (press Enter to add)</div><div class="tags-input-wrap" id="tags-input-wrap"><input type="text" id="tags-input" placeholder="Type a tag and press Enter..."></div><div style="font-size:10px;color:var(--text3);margin-top:4px"><span id="tag-count">0</span>/13 tags</div></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <div style="flex:1"><div class="mlbl">PRICE</div><input type="number" id="grader-price" placeholder="e.g. 32.99" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;outline:none;"></div>
+        <div style="flex:1"><div class="mlbl">TYPE</div><select id="grader-type" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;outline:none;"><option value="auto">Auto-detect</option><option value="necklace">Necklace</option><option value="earrings">Earrings</option><option value="ring">Ring</option><option value="bracelet">Bracelet</option><option value="default">Other</option></select></div>
+      </div>
+      <button class="kw-btn" style="margin-top:14px;width:100%" onclick="runGrader()">&#127919; Grade This Listing</button>
+    </div>
+    <div class="grade-result" id="grade-result" style="display:none"></div>
+  </div>
+  <div class="page" id="page-keyword-tool">
+    <div class="page-header"><div class="page-title">Keyword Explorer</div><div class="page-sub">Discover high-traffic, low-competition keywords for your Etsy shop</div></div>
+    <div class="kw-search-wrap"><input class="kw-input" id="kw-search-input" placeholder="Enter a keyword (e.g. flower jewelry, botanical ring, resin necklace)..." onkeydown="if(event.key==='Enter')searchKeywords()"><button class="kw-btn" onclick="searchKeywords()">&#128269; Explore</button></div>
+    <div id="kw-results-area"><div style="padding:40px;text-align:center;color:var(--text2);font-size:13px">Enter a keyword above to see search volume, competition, and related keywords</div></div>
+  </div>
+  <div class="page" id="page-trending">
+    <div class="page-header"><div class="page-title">Trending Tags</div><div class="page-sub">Discover what buyers are searching for right now on Etsy</div></div>
+    <div class="filters" style="margin-bottom:16px"><button class="fchip active" onclick="filterTrends('all',this)">All</button><button class="fchip" onclick="filterTrends('jewelry',this)">&#128142; Jewelry</button><button class="fchip" onclick="filterTrends('botanical',this)">&#127807; Botanical</button><button class="fchip" onclick="filterTrends('gift',this)">&#127873; Gifts</button><button class="fchip" onclick="filterTrends('seasonal',this)">&#127800; Seasonal</button></div>
+    <div class="trend-grid" id="trend-grid"></div>
+  </div>
+  <div class="page" id="page-rank-checker">
+    <div class="page-header"><div class="page-title">Rank Checker</div><div class="page-sub">Track where your listings rank for target keywords</div></div>
+    <div class="grader-input-wrap" style="margin-bottom:20px"><div style="display:flex;gap:10px;align-items:flex-end"><div style="flex:2"><div class="mlbl">KEYWORD TO CHECK</div><input type="text" id="rank-kw-input" class="kw-input" placeholder="e.g. real flower necklace..." onkeydown="if(event.key==='Enter')checkRanks()"></div><button class="kw-btn" onclick="checkRanks()">&#128200; Check Ranks</button></div></div>
+    <div id="rank-results-area"><div style="padding:40px;text-align:center;color:var(--text2);font-size:13px">Enter a keyword above to see how your listings rank</div></div>
+  </div>
+  <div class="page" id="page-competitors">
+    <div class="page-header"><div class="page-title">Competitor Analysis</div><div class="page-sub">See how top Etsy shops in your niche are performing</div></div>
+    <div class="grader-input-wrap" style="margin-bottom:20px"><div style="display:flex;gap:10px;align-items:flex-end"><div style="flex:2"><div class="mlbl">SEARCH FOR COMPETITORS</div><input type="text" id="comp-search-input" class="kw-input" placeholder="Enter a shop name or keyword niche..." onkeydown="if(event.key==='Enter')searchCompetitors()"></div><button class="kw-btn" onclick="searchCompetitors()">&#129354; Analyze</button></div></div>
+    <div class="comp-grid" id="comp-grid"></div>
+  </div>
+  <div class="page" id="page-shop-analyzer">
+    <div class="page-header"><div class="page-title">Shop Analyzer</div><div class="page-sub">Get a complete SEO analysis of any Etsy shop</div></div>
+    <div class="grader-input-wrap" style="margin-bottom:20px"><div style="display:flex;gap:10px;align-items:flex-end"><div style="flex:2"><div class="mlbl">SHOP NAME</div><input type="text" id="shop-input" class="kw-input" placeholder="Enter Etsy shop name..." value="julietshopp" onkeydown="if(event.key==='Enter')analyzeShop()"></div><button class="kw-btn" onclick="analyzeShop()">&#127978; Analyze Shop</button></div></div>
+    <div id="shop-result-area"><div style="padding:40px;text-align:center;color:var(--text2);font-size:13px">Enter a shop name above to get a complete SEO analysis</div></div>
+  </div>
+  <div class="page" id="page-tag-report">
+    <div class="page-header"><div class="page-title">Tag Report</div><div class="page-sub">See all tags used across your listings and find gaps</div></div>
+    <div id="tag-report-area"><div class="loading"><div class="spin"></div><p>Loading tag data...</p></div></div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal"><div class="modal"><div class="modal-hdr"><div class="modal-title">Listing Analysis</div><button class="mclose" id="mclose">&#10005;</button></div><div class="mbody" id="mbody"></div></div></div>
