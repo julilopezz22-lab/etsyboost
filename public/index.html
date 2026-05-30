@@ -761,8 +761,8 @@ function runGrader(){
     '</div></div>'+
     '<div class="msec"><div class="mlbl">TITLE FEEDBACK</div><div class="miss-list">'+tR.issues.map(i=>'<div class="miss '+i.type+'"><span>'+i.icon+'</span><span>'+i.msg+'</span></div>').join('')+'</div></div>'+
     '<div class="msec"><div class="mlbl">TAG FEEDBACK</div><div class="miss-list">'+gR.issues.map(i=>'<div class="miss '+i.type+'"><span>'+i.icon+'</span><span>'+i.msg+'</span></div>').join('')+'</div></div>'+
-    '<div class="msec"><div class="mlbl">OPTIMIZED TITLE TEMPLATE</div><div class="mbox">'+ot+'</div><button class="cbtn" onclick="navigator.clipboard.writeText(''+ot.replace(/'/g,"\'")+'')" style="margin-top:8px">&#x1F4CB; Copy optimized title</button></div>'+
-    '<div class="msec"><div class="mlbl">AI PHOTO PROMPT</div><div class="nano-box"><div class="nano-lbl">&#x2728; Paste into Gemini or ChatGPT</div><div class="nano-txt">'+nb+'</div></div><button class="cbtn sec" onclick="navigator.clipboard.writeText(''+nb.replace(/'/g,"\'")+'')" >&#x1F4CB; Copy AI prompt</button></div>';
+    '<div class="msec"><div class="mlbl">OPTIMIZED TITLE TEMPLATE</div><div class="mbox">'+ot+'</div><button class="cbtn" id="grader-copy-ot" style="margin-top:8px">&#x1F4CB; Copy optimized title</button></div>'+
+    '<div class="msec"><div class="mlbl">AI PHOTO PROMPT</div><div class="nano-box"><div class="nano-lbl">&#x2728; Paste into Gemini or ChatGPT</div><div class="nano-txt">'+nb+'</div></div><button class="cbtn sec" id="grader-copy-nb" >&#x1F4CB; Copy AI prompt</button></div>';
   result.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -841,7 +841,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(e.key==='Enter'||e.key===','){e.preventDefault();const v=tagsInput.value.replace(/,/g,'').trim();if(v&&graderTags.length<13&&!graderTags.includes(v)){graderTags.push(v);const pill=document.createElement('div');pill.className='tag-pill';pill.innerHTML=v+'<span class="tag-pill-rm" data-tag="'+v+'">&times;</span>';pill.querySelector('.tag-pill-rm').onclick=function(){graderTags=graderTags.filter(t=>t!==v);pill.remove();document.getElementById('tag-count').textContent=graderTags.length;};tagsWrap.insertBefore(pill,tagsInput);tagsInput.value='';document.getElementById('tag-count').textContent=graderTags.length;}}
     if(e.key==='Backspace'&&!tagsInput.value.length&&graderTags.length){const last=graderTags[graderTags.length-1];graderTags.pop();tagsWrap.querySelectorAll('.tag-pill').forEach(p=>{if(p.textContent.replace('×','').trim()===last)p.remove();});document.getElementById('tag-count').textContent=graderTags.length;}
   });
-  // Trending category filters
+  // Grader copy buttons (delegated)
+document.addEventListener('click',e=>{
+  if(e.target.id==='grader-copy-ot'){const ot=optTitle(detectType(document.getElementById('grader-title').value));navigator.clipboard.writeText(ot).then(()=>{e.target.textContent='Copied!';setTimeout(()=>{e.target.innerHTML='&#x1F4CB; Copy optimized title';},2000);});}
+  if(e.target.id==='grader-copy-nb'){const nb=nanoBanana(detectType(document.getElementById('grader-title').value));navigator.clipboard.writeText(nb).then(()=>{e.target.textContent='Copied!';setTimeout(()=>{e.target.innerHTML='&#x1F4CB; Copy AI prompt';},2000);});}
+});
+// Trending category filters
   document.querySelectorAll('[data-tcat]').forEach(btn=>{
     btn.addEventListener('click',()=>{document.querySelectorAll('[data-tcat]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTrendingTags(btn.dataset.tcat);});
   });
