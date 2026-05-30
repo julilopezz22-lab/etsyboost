@@ -503,7 +503,7 @@ function searchKeywords(){
       {tag:'nature gift for her',vol:'7.3K',opp:'Low'},
       {tag:'handmade resin ring',vol:'5.6K',opp:'Low'},
     ];
-    document.getElementById('kw-results-area').insertAdjacentHTML('afterend','<div style="margin-top:20px"><div style="font-family:Syne,sans-serif;font-size:14px;font-weight:600;margin-bottom:12px">&#x1F4A1; Related keyword ideas</div><div class="kw-ideas-grid">'+ideas.map(i=>'<div class="kw-idea-card" onclick="document.getElementById('kw-search-input').value=''+i.tag+'';searchKeywords()"><div class="kw-idea-tag">'+i.tag+'</div><div class="kw-idea-meta">~'+i.vol+'/mo &nbsp;&#x2022;&nbsp; Opp: '+i.opp+'</div></div>').join('')+'</div></div>');
+    document.getElementById('kw-results-area').insertAdjacentHTML('afterend','<div style="margin-top:20px"><div style="font-family:Syne,sans-serif;font-size:14px;font-weight:600;margin-bottom:12px">&#x1F4A1; Related keyword ideas</div><div class="kw-ideas-grid">'+ideas.map(i=>'<div class="kw-idea-card" data-kwclick="true" data-tag="'+i.tag+'"><div class="kw-idea-tag">'+i.tag+'</div><div class="kw-idea-meta">~'+i.vol+'/mo &nbsp;&#x2022;&nbsp; Opp: '+i.opp+'</div></div>').join('')+'</div></div>');
   },600);
 }
 
@@ -572,7 +572,7 @@ function renderTrendingTags(cat){
 function trendCard(t){
   const maxVol=22000;const volNum=parseInt((t.vol||'0').replace(/[^0-9]/g,''))||0;
   const pct=Math.min(100,(volNum/maxVol*100)).toFixed(0);
-  return '<div class="trend-card" onclick="document.getElementById('kw-search-input').value=''+t.tag+'';showPage('keyword-tool');searchKeywords()">'+
+  return '<div class="trend-card" data-kwclick="true" data-tag="'+t.tag+'">'+
     '<div class="trend-tag">'+t.tag+'</div>'+
     '<div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:'+pct+'%;background:var(--accent)"></div></div>'+
     '<div class="trend-meta"><span>'+t.vol+'</span><span class="trend-badge '+t.badge+'">'+t.btext+'</span></div>'+
@@ -713,7 +713,7 @@ function renderTagReport(){
   const sorted=Object.values(tagMap).sort((a,b)=>b.totalViews-a.totalViews);
   const maxV=sorted[0]?.totalViews||1;
   function sizeClass(count){return count>=8?'sz4':count>=5?'sz3':count>=3?'sz2':'';}
-  const cloudHtml=sorted.map(t=>'<span class="tc-tag '+sizeClass(t.count)+'" onclick="document.getElementById('kw-search-input').value=''+t.tag+'';showPage('keyword-tool');searchKeywords()" title="'+t.totalViews+' views across '+t.count+' listings">'+t.tag+'</span>').join('');
+  const cloudHtml=sorted.map(t=>'<span class="tc-tag '+sizeClass(t.count)+'" data-kwclick="true" data-tag="'+t.tag+'" title="'+t.totalViews+' views across '+t.count+' listings">'+t.tag+'</span>').join('');
   const tableRows=sorted.slice(0,30).map((t,i)=>{
     const pct=(t.totalViews/maxV*100).toFixed(0);
     return '<tr><td style="font-family:'DM Mono',monospace;color:var(--text2)">'+(i+1)+'</td>'+
