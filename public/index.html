@@ -168,6 +168,28 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .seo-fill{height:100%;border-radius:4px;transition:width .5s;}
 .seo-green{background:var(--green);}.seo-amber{background:var(--amber);}.seo-red{background:var(--red);}
 .label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:11px;}
+/* ── HEALTH CHECK STYLES ── */
+.hc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:20px;}
+.hc-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:border-color .15s;}
+.hc-card.has-issues{border-color:rgba(255,79,79,.3);}.hc-card.ok{border-color:rgba(29,189,110,.2);}
+.hc-title{font-size:11px;font-weight:500;margin-bottom:8px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.hc-issues{display:flex;flex-direction:column;gap:4px;}
+.hc-issue{font-size:10px;padding:4px 8px;border-radius:6px;display:flex;align-items:flex-start;gap:5px;line-height:1.4;}
+.hc-issue.spelling{background:var(--red-dim);color:var(--red);}.hc-issue.short{background:var(--amber-dim);color:var(--amber);}.hc-issue.ok{background:var(--green-dim);color:var(--green);}
+.hc-summary{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.hc-stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;min-width:120px;}
+.hc-stat-val{font-size:22px;font-weight:700;font-family:'DM Mono',monospace;margin-bottom:2px;}.hc-stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;}
+.bulk-table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.bulk-table{width:100%;border-collapse:collapse;}
+.bulk-table th{text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:10px 14px;border-bottom:1px solid var(--border);}
+.bulk-table td{padding:9px 14px;border-bottom:1px solid var(--border);font-size:11px;vertical-align:middle;}
+.bulk-table tr:last-child td{border-bottom:none;}.bulk-table tr:hover td{background:var(--bg3);}
+.bulk-pri{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;text-transform:uppercase;}
+.pri-critical{background:var(--red-dim);color:var(--red);}.pri-high{background:var(--amber-dim);color:var(--amber);}.pri-medium{background:var(--blue-dim);color:var(--blue);}.pri-low{background:var(--green-dim);color:var(--green);}
+.ms-input-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;}
+.ms-shop-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.ms-shop-card:hover{border-color:var(--accent);}.ms-shop-card.active-shop{border-color:var(--accent);background:var(--green-dim);}
+.ms-shop-name{font-size:14px;font-weight:600;}.ms-shop-meta{font-size:11px;color:var(--text2);margin-top:2px;}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 @media(max-width:768px){.sidebar{width:56px;min-width:56px;}.sidebar .nav-item span:not(.ni){display:none;}.sidebar .nsl{display:none;}.sidebar .logo-txt{display:none;}.grid{grid-template-columns:1fr 1fr;}}
 </style></head><body>
@@ -184,6 +206,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <div class="nav-item" data-page="competitors"><span class="ni">&#x1F4CA;</span><span>Competitors</span></div>
 <div class="nav-item" data-page="shop-analyzer"><span class="ni">&#x1F3EA;</span><span>Shop Analyzer</span></div>
 <div class="nav-item" data-page="tag-report"><span class="ni">&#x1F3F7;</span><span>Tag Report</span></div>
+<div class="nav-item" data-page="health-check"><span class="ni">&#x1FA7A;</span><span>Health Check</span></div>
+<div class="nav-item" data-page="bulk-analysis"><span class="ni">&#x1F4CA;</span><span>Bulk Analysis</span></div>
+<div class="nsl">Multi-Store</div>
+<div class="nav-item" data-page="multi-store"><span class="ni">&#x1F3EA;</span><span>Switch Shop</span></div>
 <div class="sidebar-footer"><div class="status-pill"><div class="sdot dot-off" id="sdot"></div><span id="stxt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Connecting...</span></div></div>
 </nav>
 <div class="main-area">
@@ -279,6 +305,47 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 
 </div>
 
+
+<div class="page" id="page-health-check">
+<div class="page-hdr"><div class="page-title">&#x1FA7A; Health Check</div><div class="page-sub">Spelling errors, short titles, and missing tags detected automatically across all your listings</div></div>
+<div id="hc-summary" class="hc-summary"></div>
+<div class="toolbar" style="margin-bottom:16px">
+<button class="fchip active" data-hcf="all">All Issues</button>
+<button class="fchip" data-hcf="spelling">&#x274C; Spelling</button>
+<button class="fchip" data-hcf="short">&#x1F4CF; Short Title</button>
+<button class="fchip" data-hcf="tags">&#x1F3F7; Tag Issues</button>
+<button class="fchip" data-hcf="ok">&#x2705; Healthy</button>
+</div>
+<div id="hc-grid" class="hc-grid"></div>
+</div>
+<div class="page" id="page-bulk-analysis">
+<div class="page-hdr"><div class="page-title">&#x1F4CA; Bulk Analysis</div><div class="page-sub">All listings ranked by SEO priority — fix the most impactful issues first</div></div>
+<div class="toolbar" style="margin-bottom:16px">
+<button class="fchip active" data-bkf="all">All</button>
+<button class="fchip" data-bkf="critical">&#x1F534; Critical</button>
+<button class="fchip" data-bkf="high">&#x1F7E1; High Priority</button>
+<button class="fchip" data-bkf="medium">&#x1F535; Medium</button>
+<button class="fchip" data-bkf="low">&#x1F7E2; Low / Good</button>
+</div>
+<div id="bulk-export-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+<div style="font-size:12px;color:var(--text2)" id="bulk-count">Load listings first</div>
+<button class="kw-btn" style="font-size:11px;padding:7px 14px" id="bulk-export-btn">&#x1F4E5; Export CSV</button>
+</div>
+<div class="bulk-table-wrap" id="bulk-table-wrap"><div style="padding:40px;text-align:center;color:var(--text2)">Load listings from My Listings first to generate bulk analysis.</div></div>
+</div>
+<div class="page" id="page-multi-store">
+<div class="page-hdr"><div class="page-title">&#x1F3EA; Multi-Store Manager</div><div class="page-sub">Switch between Etsy shops or analyze any public shop</div></div>
+<div class="ms-input-box">
+<div class="mlbl" style="margin-bottom:8px">ADD SHOP TO TRACK</div>
+<div style="display:flex;gap:10px">
+<input class="kw-input" id="ms-new-shop-input" type="text" placeholder="Enter Etsy shop name (e.g. floralbyjulia)..." style="flex:1">
+<button class="kw-btn" id="ms-add-btn">&#x2795; Add Shop</button>
+</div>
+</div>
+<div class="mlbl" style="margin-bottom:10px">YOUR SHOPS</div>
+<div id="ms-shops-list"></div>
+<div style="margin-top:20px;padding:14px;background:var(--blue-dim);border:1px solid rgba(74,158,255,.2);border-radius:8px;font-size:11px;color:var(--blue)">&#x2139;&#xFE0F; When you switch shops, all dashboard data reloads automatically for that shop.</div>
+</div>
 <div class="modal-overlay" id="modal"><div class="modal">
 <div class="modal-hdr"><div class="modal-title">Listing Analysis</div><button class="mclose" id="mclose">&#x2715;</button></div>
 <div class="mbody" id="mbody"></div>
@@ -766,7 +833,163 @@ function runGrader(){
   result.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-/* ── LOAD LISTINGS ── */
+
+
+/* ── HEALTH CHECK ── */
+const COMMON_MISSPELLINGS = {
+  'necklase':'necklace','neclace':'necklace','neckalce':'necklace','jewerelly':'jewelry',
+  'jewlery':'jewelry','jwelery':'jewelry','jewellry':'jewelry','earing':'earring',
+  'erring':'earring','earrig':'earring','studs earings':'stud earrings',
+  'preseved':'preserved','preserverd':'preserved','preseverd':'preserved',
+  'botancial':'botanical','botanicla':'botanical','botnical':'botanical',
+  'florwer':'flower','flowr':'flower','flwer':'flower','orchidd':'orchid',
+  'handmad':'handmade','handmaed':'handmade','naturall':'natural',
+  'birdal':'bridal','bridel':'bridal','weding':'wedding','weddig':'wedding',
+  'cotagecore':'cottagecore','cottagcore':'cottagecore','cottegcore':'cottagecore',
+  'pendent':'pendant','pendnat':'pendant','pendanat':'pendant',
+  'braclet':'bracelet','bracelat':'bracelet','bracelett':'bracelet',
+  'anceint':'ancient','minseral':'mineral','cristal':'crystal','crytal':'crystal',
+  'perssonalized':'personalized','customised':'customized','coulor':'color'
+};
+
+function checkSpelling(text) {
+  const issues = [];
+  const lower = (text || '').toLowerCase();
+  for(const [wrong, correct] of Object.entries(COMMON_MISSPELLINGS)) {
+    if(lower.includes(wrong)) {
+      issues.push({type:'spelling', word:wrong, correct});
+    }
+  }
+  return issues;
+}
+
+function getHealthIssues(listing) {
+  const issues = [];
+  const title = listing.title || '';
+  const tags = listing.tags || [];
+  
+  // Spelling errors in title
+  const spellingIssues = checkSpelling(title);
+  spellingIssues.forEach(s => {
+    issues.push({type:'spelling', msg:'Possible spelling error: "'+s.word+'" → "'+s.correct+'"'});
+  });
+  
+  // Spelling in tags
+  tags.forEach(tag => {
+    const tagSpelling = checkSpelling(tag);
+    tagSpelling.forEach(s => {
+      issues.push({type:'spelling', msg:'Tag spelling: "'+s.word+'" → "'+s.correct+'" in tag "'+tag+'"'});
+    });
+  });
+  
+  // Short title
+  if(title.length < 80) issues.push({type:'short', msg:'Title too short: '+title.length+'/140 chars'});
+  else if(title.length < 120) issues.push({type:'short', msg:'Title could be longer: '+title.length+'/140'});
+  
+  // Missing tags
+  if(tags.length < 13) issues.push({type:'tags', msg:'Only '+tags.length+'/13 tags used ('+( 13-tags.length)+' empty slots)'});
+  
+  // Tags over 20 chars
+  const longTags = tags.filter(t => t.length > 20);
+  if(longTags.length) issues.push({type:'tags', msg:'Tag too long (will be truncated): "'+longTags[0]+'"'});
+  
+  return issues;
+}
+
+let activeHCFilter = 'all';
+function renderHealthCheck() {
+  const area = document.getElementById('hc-grid');
+  const summaryEl = document.getElementById('hc-summary');
+  if(!allListings.length) {
+    area.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2);grid-column:1/-1">Load listings first from My Listings to run Health Check.</div>';
+    return;
+  }
+  
+  const analyzed = allListings.map(l => ({listing: l, issues: getHealthIssues(l)}));
+  
+  const spellingCount = analyzed.filter(a => a.issues.some(i => i.type==='spelling')).length;
+  const shortCount = analyzed.filter(a => a.issues.some(i => i.type==='short')).length;
+  const tagIssueCount = analyzed.filter(a => a.issues.some(i => i.type==='tags')).length;
+  const healthyCount = analyzed.filter(a => a.issues.length===0).length;
+  
+  summaryEl.innerHTML = 
+    '<div class="hc-stat"><div class="hc-stat-val" style="color:var(--red)">'+spellingCount+'</div><div class="hc-stat-lbl">Spelling Issues</div></div>'+
+    '<div class="hc-stat"><div class="hc-stat-val" style="color:var(--amber)">'+shortCount+'</div><div class="hc-stat-lbl">Short Titles</div></div>'+
+    '<div class="hc-stat"><div class="hc-stat-val" style="color:var(--blue)">'+tagIssueCount+'</div><div class="hc-stat-lbl">Tag Issues</div></div>'+
+    '<div class="hc-stat"><div class="hc-stat-val" style="color:var(--green)">'+healthyCount+'</div><div class="hc-stat-lbl">Healthy</div></div>'+
+    '<div class="hc-stat"><div class="hc-stat-val">'+allListings.length+'</div><div class="hc-stat-lbl">Total Listings</div></div>';
+  
+  let filtered = analyzed;
+  if(activeHCFilter === 'spelling') filtered = analyzed.filter(a => a.issues.some(i => i.type==='spelling'));
+  else if(activeHCFilter === 'short') filtered = analyzed.filter(a => a.issues.some(i => i.type==='short'));
+  else if(activeHCFilter === 'tags') filtered = analyzed.filter(a => a.issues.some(i => i.type==='tags'));
+  else if(activeHCFilter === 'ok') filtered = analyzed.filter(a => a.issues.length===0);
+  
+  if(!filtered.length) { area.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2);grid-column:1/-1">No listings match this filter.</div>'; return; }
+  
+  area.innerHTML = filtered.map(({listing: l, issues}) => {
+    const hasIssues = issues.length > 0;
+    const editUrl = 'https://www.etsy.com/your/listings/'+l.listing_id+'/edit';
+    const issueHtml = hasIssues
+      ? issues.slice(0,4).map(i => '<div class="hc-issue '+i.type+'"><span>'+(i.type==='spelling'?'&#x274C;':i.type==='short'?'&#x1F4CF;':'&#x1F3F7;')+'</span><span>'+i.msg+'</span></div>').join('')
+      : '<div class="hc-issue ok"><span>&#x2705;</span><span>No issues found — listing looks healthy!</span></div>';
+    return '<div class="hc-card '+(hasIssues?'has-issues':'ok')+'">'+
+      '<div class="hc-title">'+(l.title||'No title')+'</div>'+
+      '<div class="hc-issues">'+issueHtml+'</div>'+
+      (hasIssues?'<a href="'+editUrl+'" target="_blank" style="display:inline-block;margin-top:8px;font-size:10px;color:var(--blue)">Edit on Etsy &#x2197;</a>':'')+
+      '</div>';
+  }).join('');
+}
+
+/* ── BULK ANALYSIS ── */
+let activeBulkFilter = 'all';
+function getPriority(score) {
+  if(score < 30) return {level:'critical',label:'Critical',cls:'pri-critical'};
+  if(score < 50) return {level:'high',label:'High',cls:'pri-high'};
+  if(score < 75) return {level:'medium',label:'Medium',cls:'pri-medium'};
+  return {level:'low',label:'Good',cls:'pri-low'};
+}
+
+function getMainIssue(l) {
+  const issues = [];
+  if((l.title||'').length < 80) issues.push('Title too short ('+( l.title||'').length+' chars)');
+  if((l.tags||[]).length < 13) issues.push('Missing tags ('+( l.tags||[]).length+'/13)');
+  if((l.tags||[]).some(t => t.length > 20)) issues.push('Tag too long');
+  const spellingIssues = checkSpelling(l.title||'');
+  if(spellingIssues.length) issues.push('Possible spelling: "'+spellingIssues[0].word+'"');
+  return issues.length ? issues[0] : 'Optimize further';
+}
+
+function renderBulkAnalysis() {
+  const wrap = document.getElementById('bulk-table-wrap');
+  const countEl = document.getElementById('bulk-count');
+  if(!allListings.length) { 
+    wrap.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2)">Load listings from My Listings first.</div>';
+    return; 
+  }
+  
+  let sorted = [...allListings].sort((a,b) => a._score - b._score);
+  if(activeBulkFilter !== 'all') {
+    sorted = sorted.filter(l => getPriority(l._score).level === activeBulkFilter);
+  }
+  
+  countEl.textContent = sorted.length + ' listings • Sorted by priority (worst first)';
+  
+  if(!sorted.length) { wrap.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2)">No listings in this priority level.</div>'; return; }
+  
+  wrap.innerHTML = '<table class="bulk-table"><thead><tr><th>#</th><th>Listing</th><th>Score</th><th>Priority</th><th>Main Issue</th><th>Views</th><th>Price</th><th></th></tr></thead><tbody>'+
+    sorted.map((l, idx) => {
+      const pri = getPriority(l._score);
+      const issue = getMainIssue(l);
+      const editUrl = 'https://www.etsy.com/your/listings/'+l.listing_id+'/edit';
+      return '<tr>'+
+        '<td style="color:var(--text3);font-family:DM Mono,monospace">'+(idx+1)+'</td>'+
+        '<td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500">'+(l.title||'').substring(0,55)+'...</td>'+
+        '<td><span class="sbadge '+scClass(l._score)+'">'+l._score+'</span></td>'+
+        '<td><span class="bulk-pri '+pri.cls+'">'+pri.label+'</span></td>'+
+        '<td style="color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+issue+'</td>'+
+        '<td style="font-family:DM Mono,monospace">'+(l.views||0)+'</td>'+
+        '<td style="color:var(--green);font-family:DM Mono,monospace">
 async function loadListings(){
   try{
     const res=await fetch('/api/listings?shop='+SHOP);
@@ -802,6 +1025,9 @@ function showPage(pageId){
   document.querySelector('[data-page="'+pageId+'"]')?.classList.add('active');
   if(pageId==='trending')renderTrendingTags('all');
   if(pageId==='tag-report')renderTagReport();
+  if(pageId==='health-check')renderHealthCheck();
+  if(pageId==='bulk-analysis')renderBulkAnalysis();
+  if(pageId==='multi-store')renderShopsList();
 }
 
 /* ── INIT ── */
@@ -852,6 +1078,344 @@ document.addEventListener('click',e=>{
   });
   // Start
   loadListings();
+  renderShopsList();
   renderTrendingTags('all');
+
+  // Health Check filters
+  document.querySelectorAll('[data-hcf]').forEach(btn=>{
+    btn.addEventListener('click',()=>{activeHCFilter=btn.dataset.hcf;document.querySelectorAll('[data-hcf]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderHealthCheck();});
+  });
+  // Bulk Analysis filters  
+  document.querySelectorAll('[data-bkf]').forEach(btn=>{
+    btn.addEventListener('click',()=>{activeBulkFilter=btn.dataset.bkf;document.querySelectorAll('[data-bkf]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBulkAnalysis();});
+  });
+  document.getElementById('bulk-export-btn')?.addEventListener('click',exportBulkCSV);
+  // Multi-store
+  document.getElementById('ms-add-btn')?.addEventListener('click',()=>addShop(document.getElementById('ms-new-shop-input').value));
+  document.getElementById('ms-new-shop-input')?.addEventListener('keydown',e=>{if(e.key==='Enter')addShop(e.target.value);});
 });
-</script></body></html>
+</script></body></html>+l._price+'</td>'+
+        '<td><a href="'+editUrl+'" target="_blank" class="abtn">Edit</a></td>'+
+        '</tr>';
+    }).join('')+'</tbody></table>';
+}
+
+function exportBulkCSV() {
+  if(!allListings.length) return;
+  const rows = [['Title','Score','Priority','Main Issue','Views','Price','Tags Used','Title Length']];
+  [...allListings].sort((a,b)=>a._score-b._score).forEach(l=>{
+    const pri = getPriority(l._score).label;
+    const issue = getMainIssue(l);
+    rows.push([
+      '"'+(l.title||'').replace(/"/g,'""')+'"',
+      l._score, pri,
+      '"'+issue.replace(/"/g,'""')+'"',
+      l.views||0, '
+async function loadListings(){
+  try{
+    const res=await fetch('/api/listings?shop='+SHOP);
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'API error');
+    allListings=scoreAll(data.results||[]);
+    document.getElementById('loading-section').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    document.getElementById('sdot').className='sdot dot-live';
+    document.getElementById('stxt').textContent='Live – '+SHOP+' ('+data.count+' listings)';
+    renderStats(allListings);renderGrid(getFiltered());loadImagesLazily(allListings);
+    // Auto-update tag report and trending if already on those pages
+    if(document.getElementById('page-tag-report').classList.contains('active'))renderTagReport();
+    const total=data.count||0;
+    for(let offset=25;offset<total;offset+=25){
+      try{const r2=await fetch('/api/listings?shop='+SHOP+'&offset='+offset);const d2=await r2.json();const more=scoreAll(d2.results||[]);allListings=[...allListings,...more];renderStats(allListings);renderGrid(getFiltered());loadImagesLazily(more);}catch(e){break;}
+    }
+  }catch(e){
+    document.getElementById('loading-section').style.display='none';
+    document.getElementById('error-section').style.display='block';
+    document.getElementById('err-title').textContent='Could not load listings';
+    document.getElementById('err-msg').textContent=e.message;
+    document.getElementById('sdot').className='sdot dot-off';
+    document.getElementById('stxt').textContent='Offline';
+  }
+}
+
+/* ── NAVIGATION ── */
+function showPage(pageId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+pageId)?.classList.add('active');
+  document.querySelector('[data-page="'+pageId+'"]')?.classList.add('active');
+  if(pageId==='trending')renderTrendingTags('all');
+  if(pageId==='tag-report')renderTagReport();
+  if(pageId==='health-check')renderHealthCheck();
+  if(pageId==='bulk-analysis')renderBulkAnalysis();
+  if(pageId==='multi-store')renderShopsList();
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded',()=>{
+  // Nav
+  document.querySelectorAll('.nav-item[data-page]').forEach(item=>{
+    item.addEventListener('click',()=>showPage(item.dataset.page));
+  });
+  // Modal
+  document.getElementById('mclose').onclick=()=>document.getElementById('modal').classList.remove('open');
+  document.getElementById('modal').onclick=e=>{if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');};
+  // My Listings filters
+  document.querySelectorAll('#page-listings .fchip').forEach(btn=>{
+    btn.addEventListener('click',()=>{activeFilter=btn.dataset.f;document.querySelectorAll('#page-listings .fchip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderGrid(getFiltered());});
+  });
+  document.getElementById('search-input').addEventListener('input',()=>renderGrid(getFiltered()));
+  document.getElementById('sort-sel').addEventListener('change',()=>renderGrid(getFiltered()));
+  // Keyword Explorer
+  document.getElementById('kw-search-btn').addEventListener('click',searchKeywords);
+  document.getElementById('kw-search-input').addEventListener('keydown',e=>{if(e.key==='Enter')searchKeywords();});
+  // Rank Checker
+  document.getElementById('rank-check-btn').addEventListener('click',checkRanks);
+  document.getElementById('rank-kw-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkRanks();});
+  // Competitors
+  document.getElementById('comp-btn').addEventListener('click',analyzeCompetitor);
+  document.getElementById('comp-input').addEventListener('keydown',e=>{if(e.key==='Enter')analyzeCompetitor();});
+  // Shop Analyzer
+  document.getElementById('shop-analyze-btn').addEventListener('click',analyzeShop);
+  document.getElementById('shop-input').addEventListener('keydown',e=>{if(e.key==='Enter')analyzeShop();});
+  // Listing Grader
+  document.getElementById('grade-btn').addEventListener('click',runGrader);
+  document.getElementById('grader-title').addEventListener('input',function(){document.getElementById('grader-char-count').textContent=this.value.length+' / 140';});
+  const tagsInput=document.getElementById('tags-input');
+  const tagsWrap=document.getElementById('tags-input-wrap');
+  tagsWrap.addEventListener('click',()=>tagsInput.focus());
+  tagsInput.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===','){e.preventDefault();const v=tagsInput.value.replace(/,/g,'').trim();if(v&&graderTags.length<13&&!graderTags.includes(v)){graderTags.push(v);const pill=document.createElement('div');pill.className='tag-pill';pill.innerHTML=v+'<span class="tag-pill-rm" data-tag="'+v+'">&times;</span>';pill.querySelector('.tag-pill-rm').onclick=function(){graderTags=graderTags.filter(t=>t!==v);pill.remove();document.getElementById('tag-count').textContent=graderTags.length;};tagsWrap.insertBefore(pill,tagsInput);tagsInput.value='';document.getElementById('tag-count').textContent=graderTags.length;}}
+    if(e.key==='Backspace'&&!tagsInput.value.length&&graderTags.length){const last=graderTags[graderTags.length-1];graderTags.pop();tagsWrap.querySelectorAll('.tag-pill').forEach(p=>{if(p.textContent.replace('×','').trim()===last)p.remove();});document.getElementById('tag-count').textContent=graderTags.length;}
+  });
+  // Grader copy buttons (delegated)
+document.addEventListener('click',e=>{
+  if(e.target.id==='grader-copy-ot'){const ot=optTitle(detectType(document.getElementById('grader-title').value));navigator.clipboard.writeText(ot).then(()=>{e.target.textContent='Copied!';setTimeout(()=>{e.target.innerHTML='&#x1F4CB; Copy optimized title';},2000);});}
+  if(e.target.id==='grader-copy-nb'){const nb=nanoBanana(detectType(document.getElementById('grader-title').value));navigator.clipboard.writeText(nb).then(()=>{e.target.textContent='Copied!';setTimeout(()=>{e.target.innerHTML='&#x1F4CB; Copy AI prompt';},2000);});}
+});
+// Trending category filters
+  document.querySelectorAll('[data-tcat]').forEach(btn=>{
+    btn.addEventListener('click',()=>{document.querySelectorAll('[data-tcat]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTrendingTags(btn.dataset.tcat);});
+  });
+  // Start
+  loadListings();
+  renderShopsList();
+  renderTrendingTags('all');
+
+  // Health Check filters
+  document.querySelectorAll('[data-hcf]').forEach(btn=>{
+    btn.addEventListener('click',()=>{activeHCFilter=btn.dataset.hcf;document.querySelectorAll('[data-hcf]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderHealthCheck();});
+  });
+  // Bulk Analysis filters  
+  document.querySelectorAll('[data-bkf]').forEach(btn=>{
+    btn.addEventListener('click',()=>{activeBulkFilter=btn.dataset.bkf;document.querySelectorAll('[data-bkf]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBulkAnalysis();});
+  });
+  document.getElementById('bulk-export-btn')?.addEventListener('click',exportBulkCSV);
+  // Multi-store
+  document.getElementById('ms-add-btn')?.addEventListener('click',()=>addShop(document.getElementById('ms-new-shop-input').value));
+  document.getElementById('ms-new-shop-input')?.addEventListener('keydown',e=>{if(e.key==='Enter')addShop(e.target.value);});
+});
+</script></body></html>+l._price,
+      (l.tags||[]).length,
+      (l.title||'').length
+    ]);
+  });
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='etsyboost-bulk-analysis.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+/* ── MULTI-STORE ── */
+let savedShops = JSON.parse(localStorage.getItem('etsyboost_shops')||'["julietshopp"]');
+let currentShop = localStorage.getItem('etsyboost_active_shop')||'julietshopp';
+
+function renderShopsList() {
+  const el = document.getElementById('ms-shops-list');
+  if(!el) return;
+  el.innerHTML = savedShops.map(shop => {
+    const isActive = shop === currentShop;
+    return '<div class="ms-shop-card'+(isActive?' active-shop':'')+'" data-shop="'+shop+'">'+
+      '<div><div class="ms-shop-name">'+shop+(isActive?' <span style="font-size:10px;color:var(--green)">✓ Active</span>':'')+'</div>'+
+      '<div class="ms-shop-meta"><a href="https://www.etsy.com/shop/'+shop+'" target="_blank" style="color:var(--blue)">View on Etsy &#x2197;</a></div></div>'+
+      '<div style="display:flex;gap:6px;align-items:center">'+
+      (!isActive?'<button class="kw-btn" style="font-size:11px;padding:6px 12px" data-switch="'+shop+'">Switch</button>':'')+
+      (shop!=='julietshopp'&&!isActive?'<button class="abtn" style="color:var(--red)" data-remove="'+shop+'">Remove</button>':'')+
+      '</div></div>';
+  }).join('');
+  
+  el.querySelectorAll('[data-switch]').forEach(btn => {
+    btn.onclick = () => switchShop(btn.dataset.switch);
+  });
+  el.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.onclick = () => {
+      savedShops = savedShops.filter(s => s !== btn.dataset.remove);
+      localStorage.setItem('etsyboost_shops', JSON.stringify(savedShops));
+      renderShopsList();
+    };
+  });
+}
+
+function switchShop(shopName) {
+  currentShop = shopName;
+  localStorage.setItem('etsyboost_active_shop', shopName);
+  // Update global SHOP variable and status bar
+  document.getElementById('stxt').textContent = 'Switching to '+shopName+'...';
+  document.getElementById('sdot').className = 'sdot dot-off';
+  // Reset listings
+  allListings = [];
+  // Update sidebar status
+  document.getElementById('loading-section').style.display='block';
+  document.getElementById('dashboard').style.display='none';
+  // Reload with new shop
+  reloadForShop(shopName);
+  renderShopsList();
+  // Go to My Listings
+  showPage('listings');
+}
+
+async function reloadForShop(shopName) {
+  try {
+    const res = await fetch('/api/listings?shop='+shopName);
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'API error');
+    allListings = scoreAll(data.results||[]);
+    document.getElementById('loading-section').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    document.getElementById('sdot').className='sdot dot-live';
+    document.getElementById('stxt').textContent='Live – '+shopName+' ('+data.count+' listings)';
+    renderStats(allListings); renderGrid(getFiltered()); loadImagesLazily(allListings);
+    const total = data.count||0;
+    for(let offset=25;offset<total;offset+=25){
+      try{const r2=await fetch('/api/listings?shop='+shopName+'&offset='+offset);const d2=await r2.json();const more=scoreAll(d2.results||[]);allListings=[...allListings,...more];renderStats(allListings);renderGrid(getFiltered());loadImagesLazily(more);}catch(e){break;}
+    }
+  } catch(e) {
+    document.getElementById('loading-section').style.display='none';
+    document.getElementById('error-section').style.display='block';
+    document.getElementById('err-title').textContent='Could not load '+shopName;
+    document.getElementById('err-msg').textContent=e.message;
+    document.getElementById('sdot').className='sdot dot-off';
+    document.getElementById('stxt').textContent='Error loading '+shopName;
+  }
+}
+
+function addShop(shopName) {
+  if(!shopName) return;
+  const clean = shopName.trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+  if(!clean) return;
+  if(!savedShops.includes(clean)) {
+    savedShops.push(clean);
+    localStorage.setItem('etsyboost_shops', JSON.stringify(savedShops));
+  }
+  renderShopsList();
+  document.getElementById('ms-new-shop-input').value='';
+}
+
+/* ── LOAD LISTINGS ── */
+async function loadListings(){
+  try{
+    const res=await fetch('/api/listings?shop='+SHOP);
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'API error');
+    allListings=scoreAll(data.results||[]);
+    document.getElementById('loading-section').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    document.getElementById('sdot').className='sdot dot-live';
+    document.getElementById('stxt').textContent='Live – '+SHOP+' ('+data.count+' listings)';
+    renderStats(allListings);renderGrid(getFiltered());loadImagesLazily(allListings);
+    // Auto-update tag report and trending if already on those pages
+    if(document.getElementById('page-tag-report').classList.contains('active'))renderTagReport();
+    const total=data.count||0;
+    for(let offset=25;offset<total;offset+=25){
+      try{const r2=await fetch('/api/listings?shop='+SHOP+'&offset='+offset);const d2=await r2.json();const more=scoreAll(d2.results||[]);allListings=[...allListings,...more];renderStats(allListings);renderGrid(getFiltered());loadImagesLazily(more);}catch(e){break;}
+    }
+  }catch(e){
+    document.getElementById('loading-section').style.display='none';
+    document.getElementById('error-section').style.display='block';
+    document.getElementById('err-title').textContent='Could not load listings';
+    document.getElementById('err-msg').textContent=e.message;
+    document.getElementById('sdot').className='sdot dot-off';
+    document.getElementById('stxt').textContent='Offline';
+  }
+}
+
+/* ── NAVIGATION ── */
+function showPage(pageId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+pageId)?.classList.add('active');
+  document.querySelector('[data-page="'+pageId+'"]')?.classList.add('active');
+  if(pageId==='trending')renderTrendingTags('all');
+  if(pageId==='tag-report')renderTagReport();
+  if(pageId==='health-check')renderHealthCheck();
+  if(pageId==='bulk-analysis')renderBulkAnalysis();
+  if(pageId==='multi-store')renderShopsList();
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded',()=>{
+  // Nav
+  document.querySelectorAll('.nav-item[data-page]').forEach(item=>{
+    item.addEventListener('click',()=>showPage(item.dataset.page));
+  });
+  // Modal
+  document.getElementById('mclose').onclick=()=>document.getElementById('modal').classList.remove('open');
+  document.getElementById('modal').onclick=e=>{if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');};
+  // My Listings filters
+  document.querySelectorAll('#page-listings .fchip').forEach(btn=>{
+    btn.addEventListener('click',()=>{activeFilter=btn.dataset.f;document.querySelectorAll('#page-listings .fchip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderGrid(getFiltered());});
+  });
+  document.getElementById('search-input').addEventListener('input',()=>renderGrid(getFiltered()));
+  document.getElementById('sort-sel').addEventListener('change',()=>renderGrid(getFiltered()));
+  // Keyword Explorer
+  document.getElementById('kw-search-btn').addEventListener('click',searchKeywords);
+  document.getElementById('kw-search-input').addEventListener('keydown',e=>{if(e.key==='Enter')searchKeywords();});
+  // Rank Checker
+  document.getElementById('rank-check-btn').addEventListener('click',checkRanks);
+  document.getElementById('rank-kw-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkRanks();});
+  // Competitors
+  document.getElementById('comp-btn').addEventListener('click',analyzeCompetitor);
+  document.getElementById('comp-input').addEventListener('keydown',e=>{if(e.key==='Enter')analyzeCompetitor();});
+  // Shop Analyzer
+  document.getElementById('shop-analyze-btn').addEventListener('click',analyzeShop);
+  document.getElementById('shop-input').addEventListener('keydown',e=>{if(e.key==='Enter')analyzeShop();});
+  // Listing Grader
+  document.getElementById('grade-btn').addEventListener('click',runGrader);
+  document.getElementById('grader-title').addEventListener('input',function(){document.getElementById('grader-char-count').textContent=this.value.length+' / 140';});
+  const tagsInput=document.getElementById('tags-input');
+  const tagsWrap=document.getElementById('tags-input-wrap');
+  tagsWrap.addEventListener('click',()=>tagsInput.focus());
+  tagsInput.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===','){e.preventDefault();const v=tagsInput.value.replace(/,/g,'').trim();if(v&&graderTags.length<13&&!graderTags.includes(v)){graderTags.push(v);const pill=document.createElement('div');pill.className='tag-pill';pill.innerHTML=v+'<span class="tag-pill-rm" data-tag="'+v+'">&times;</span>';pill.querySelector('.tag-pill-rm').onclick=function(){graderTags=graderTags.filter(t=>t!==v);pill.remove();document.getElementById('tag-count').textContent=graderTags.length;};tagsWrap.insertBefore(pill,tagsInput);tagsInput.value='';document.getElementById('tag-count').textContent=graderTags.length;}}
+    if(e.key==='Backspace'&&!tagsInput.value.length&&graderTags.length){const last=graderTags[graderTags.length-1];graderTags.pop();tagsWrap.querySelectorAll('.tag-pill').forEach(p=>{if(p.textContent.replace('×','').trim()===last)p.remove();});document.getElementById('tag-count').textContent=graderTags.length;}
+  });
+  // Grader copy buttons (delegated)
+document.addEventListener('click',e=>{
+  if(e.target.id==='grader-copy-ot'){const ot=optTitle(detectType(document.getElementById('grader-title').value));navigator.clipboard.writeText(ot).then(()=>{e.target.textContent='Copied!';setTimeout(()=>{e.target.innerHTML='&#x1F4CB; Copy optimized title';},2000);});}
+  if(e.target.id==='grader-copy-nb'){const nb=nanoBanana(detectType(document.getElementById('grader-title').value));navigator.clipboard.writeText(nb).then(()=>{e.target.textContent='Copied!';setTimeout(()=>{e.target.innerHTML='&#x1F4CB; Copy AI prompt';},2000);});}
+});
+// Trending category filters
+  document.querySelectorAll('[data-tcat]').forEach(btn=>{
+    btn.addEventListener('click',()=>{document.querySelectorAll('[data-tcat]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTrendingTags(btn.dataset.tcat);});
+  });
+  // Start
+  loadListings();
+  renderShopsList();
+  renderTrendingTags('all');
+
+  // Health Check filters
+  document.querySelectorAll('[data-hcf]').forEach(btn=>{
+    btn.addEventListener('click',()=>{activeHCFilter=btn.dataset.hcf;document.querySelectorAll('[data-hcf]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderHealthCheck();});
+  });
+  // Bulk Analysis filters  
+  document.querySelectorAll('[data-bkf]').forEach(btn=>{
+    btn.addEventListener('click',()=>{activeBulkFilter=btn.dataset.bkf;document.querySelectorAll('[data-bkf]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBulkAnalysis();});
+  });
+  document.getElementById('bulk-export-btn')?.addEventListener('click',exportBulkCSV);
+  // Multi-store
+  document.getElementById('ms-add-btn')?.addEventListener('click',()=>addShop(document.getElementById('ms-new-shop-input').value));
+  document.getElementById('ms-new-shop-input')?.addEventListener('keydown',e=>{if(e.key==='Enter')addShop(e.target.value);});
+});
+</script></body></html> 
