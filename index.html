@@ -428,7 +428,58 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   </div>
 </div>
 
-<!-- LISTING ANALYSIS MODAL -->
+<!-- HEALTH CHECK PAGE -->
+<div class="page" id="page-health-check">
+  <div class="page-header">
+    <div class="page-title">Health Check</div>
+    <div class="page-sub">Detecta listings con títulos cortos, pocos tags o descripciones incompletas</div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center">
+    <input class="kw-input" id="hc-shop-input" value="julietshopp" placeholder="Nombre de la shop...">
+    <button class="kw-btn" onclick="runHealthCheck()">🏥 Revisar</button>
+  </div>
+  <div id="hc-result-area"><div style="padding:40px;text-align:center;color:var(--text2)">Haz clic en Revisar para analizar tu shop</div></div>
+</div>
+
+<!-- BULK ANALYSIS PAGE -->
+<div class="page" id="page-bulk-analysis">
+  <div class="page-header">
+    <div class="page-title">Bulk Analysis</div>
+    <div class="page-sub">Estadísticas completas de todos tus listings: precios, tags, vistas</div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center">
+    <input class="kw-input" id="ba-shop-input" value="julietshopp" placeholder="Nombre de la shop...">
+    <button class="kw-btn" onclick="runBulkAnalysis()">📦 Analizar todo</button>
+  </div>
+  <div id="ba-result-area"><div style="padding:40px;text-align:center;color:var(--text2)">Haz clic en Analizar para ver las estadísticas</div></div>
+</div>
+
+<!-- TOP SELLERS PAGE -->
+<div class="page" id="page-top-sellers">
+  <div class="page-header">
+    <div class="page-title">Top Sellers</div>
+    <div class="page-sub">Busca los listings más exitosos de Etsy por keyword</div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:20px">
+    <input class="kw-input" id="ts-input" placeholder="ej: digital planner, wall art..." onkeydown="if(event.key==='Enter')runTopSellers()">
+    <button class="kw-btn" onclick="runTopSellers()">🏆 Buscar</button>
+  </div>
+  <div id="ts-result-area"><div style="padding:40px;text-align:center;color:var(--text2)">Ingresa un keyword para ver los top sellers</div></div>
+</div>
+
+<!-- TRENDS PAGE -->
+<div class="page" id="page-trends">
+  <div class="page-header">
+    <div class="page-title">Trends</div>
+    <div class="page-sub">Compara keywords por cantidad de resultados, favoritos y vistas en Etsy</div>
+  </div>
+  <div style="margin-bottom:8px;font-size:11px;color:var(--text2)">Separa los keywords con comas</div>
+  <div style="display:flex;gap:10px;margin-bottom:20px">
+    <input class="kw-input" id="tr-input" placeholder="ej: digital planner, wall art, sticker sheet" onkeydown="if(event.key==='Enter')runTrends()">
+    <button class="kw-btn" onclick="runTrends()">📊 Comparar</button>
+  </div>
+  <div id="tr-result-area"><div style="padding:40px;text-align:center;color:var(--text2)">Ingresa keywords para comparar tendencias</div></div>
+</div><!-- LISTING ANALYSIS MODAL -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <div class="modal-hdr">
