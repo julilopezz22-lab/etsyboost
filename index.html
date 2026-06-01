@@ -1107,7 +1107,141 @@ function runGrader() {
     '<button class="cbtn secondary" onclick="navigator.clipboard.writeText(''+nb.replace(/'/g,"\'")+'')" >📋 Copy AI Photo Prompt</button></div>';
 }
 
-// ===================== NAVIGATION =====================
+// ===================== HEALTH CHECK =====================
+async function runHealthCheck() {
+  const shop = document.getElementById('hc-shop-input').value.trim();
+  const area = document.getElementById('hc-result-area');
+  if (!shop) return;
+  area.innerHTML = '<div class="loading"><div class="spin"></div><p>Analizando listings...</p></div>';
+  try {
+    const r = await fetch(`/api/health-check?shop=${shop}`);
+    const data = await r.json();
+    if (data.error) { area.innerHTML = `<div style="padding:20px;color:var(--red)">Error: ${escHtml(data.error)}</div>`; return; }
+    area.innerHTML = `
+      <div class="stats-row" style="margin-bottom:20px">
+        <div class="stat"><div class="sl">Total Listings</div><div class="sv">${data.total}</div></div>
+        <div class="stat"><div class="sl">Con Problemas</div><div class="sv" style="color:var(--red)">${data.flagged_count}</div></div>
+        <div class="stat"><div class="sl">Sin Problemas</div><div class="sv" style="color:var(--green)">${data.total - data.flagged_count}</div></div>
+      </div>
+      ${data.flagged_count === 0 ? '<div style="padding:20px;background:var(--green-dim);border:1px solid var(--green);border-radius:10px;color:var(--green);text-align:center">✅ ¡Todo bien! Ningún listing tiene problemas.</div>' : ''}
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${(data.flagged || []).map(l => `
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px">
+            <div style="font-size:12px;font-weight:500;margin-bottom:8px">${escHtml(l.title || 'Sin título')}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              ${l.problems.map(p => `<span style="background:var(--red-dim);color:var(--red);border:1px solid rgba(255,79,79,.3);font-size:10px;padding:3px 10px;border-radius:20px">${escHtml(p)}</span>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>`;
+  } catch(e) { area.innerHTML = `<div style="padding:20px;color:var(--red)">Error: ${escHtml(e.message)}</div>`; }
+}
+
+// ===================== BULK ANALYSIS =====================
+async function runBulkAnalysis() {
+  const shop = document.getElementById('ba-shop-input').value.trim();
+  const area = document.getElementById('ba-result-area');
+  if (!shop) return;
+  area.innerHTML = '<div class="loading"><div class="spin"></div><p>Cargando todos los listings...</p></div>';
+  try {
+    const r = await fetch(`/api/bulk-analysis?shop=${shop}`);
+    const d = await r.json();
+    if (d.error) { area.innerHTML = `<div style="padding:20px;color:var(--red)">Error: ${escHtml(d.error)}</div>`; return; }
+    area.innerHTML = `
+      <div class="stats-row" style="margin-bottom:20px">
+        <div class="stat"><div class="sl">Total</div><div class="sv">${d.total}</div></div>
+        <div class="stat"><div class="sl">Precio Promedio</div><div class="sv" style="color:var(--green)">$${d.price_stats?.avg}</div></div>
+        <div class="stat"><div class="sl">Precio Mín</div><div class="sv">$${d.price_stats?.min}</div></div>
+        <div class="stat"><div class="sl">Precio Máx</div><div class="sv">$${d.price_stats?.max}</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div class="mlbl">Top Tags</div>
+          <div class="mtags" style="margin-top:8px">
+            ${(d.top_tags || []).map(({tag, count}) => `<span class="mtag ltag">${escHtml(tag)} <span style="opacity:.5">(${count})</span></span>`).join('')}
+          </div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div class="mlbl">Top 10 por Vistas</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+            ${(d.top_by_views || []).map(l => `
+              <div style="display:flex;justify-content:space-between;font-size:11px;border-bottom:1px solid var(--border);padding-bottom:5px">
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">${escHtml(l.title || '')}</span>
+                <span style="color:var(--text2);margin-left:8px;white-space:nowrap">${l.views} views</span>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  } catch(e) { area.innerHTML = `<div style="padding:20px;color:var(--red)">Error: ${escHtml(e.message)}</div>`; }
+}
+
+// ===================== TOP SELLERS =====================
+async function runTopSellers() {
+  const kw = document.getElementById('ts-input').value.trim();
+  const area = document.getElementById('ts-result-area');
+  if (!kw) return;
+  area.innerHTML = '<div class="loading"><div class="spin"></div><p>Buscando top sellers...</p></div>';
+  try {
+    const r = await fetch(`/api/top-sellers?keyword=${encodeURIComponent(kw)}`);
+    const d = await r.json();
+    if (d.error) { area.innerHTML = `<div style="padding:20px;color:var(--red)">Error: ${escHtml(JSON.stringify(d.error))}</div>`; return; }
+    area.innerHTML = `
+      <div style="margin-bottom:12px;font-size:12px;color:var(--text2)">
+        <strong style="color:var(--text)">${(d.total||0).toLocaleString()}</strong> resultados · Precio promedio top 25: <strong style="color:var(--green)">$${d.avg_price}</strong>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div class="mlbl">Tags más usados por top sellers</div>
+          <div class="mtags" style="margin-top:8px">
+            ${(d.tag_insights||[]).map(({tag,count}) => `<span class="mtag ltag" style="cursor:pointer;border-color:var(--blue)" onclick="navigator.clipboard.writeText('${tag.replace(/'/g,"\\'")}');this.style.borderColor='var(--green)';this.style.color='var(--green)'">${escHtml(tag)} (${count})</span>`).join('')}
+          </div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div class="mlbl">Top Listings</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+            ${(d.results||[]).slice(0,8).map(l => `
+              <div style="font-size:11px;border-bottom:1px solid var(--border);padding-bottom:6px">
+                <a href="${l.url||'#'}" target="_blank" style="color:var(--text);text-decoration:none;font-weight:500">${escHtml((l.title||'').substring(0,55))}...</a>
+                <div style="color:var(--text2);margin-top:2px">$${l.price} · ❤️ ${l.num_favorers} · 👁 ${l.views}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  } catch(e) { area.innerHTML = `<div style="padding:20px;color:var(--red)">Error: ${escHtml(e.message)}</div>`; }
+}
+
+// ===================== TRENDS =====================
+async function runTrends() {
+  const kws = document.getElementById('tr-input').value.trim();
+  const area = document.getElementById('tr-result-area');
+  if (!kws) return;
+  area.innerHTML = '<div class="loading"><div class="spin"></div><p>Comparando keywords...</p></div>';
+  try {
+    const r = await fetch(`/api/trends?keywords=${encodeURIComponent(kws)}`);
+    const d = await r.json();
+    if (d.error) { area.innerHTML = `<div style="padding:20px;color:var(--red)">Error: ${escHtml(d.error)}</div>`; return; }
+    const max = Math.max(...(d.trends||[]).map(t => t.count||0));
+    area.innerHTML = `
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+        <table class="kw-table">
+          <thead><tr>
+            <th>Keyword</th><th>Resultados en Etsy</th><th>Avg Favoritos</th><th>Avg Vistas</th>
+          </tr></thead>
+          <tbody>
+            ${(d.trends||[]).map(row => `
+              <tr>
+                <td><span class="kw-keyword">${escHtml(row.keyword)}</span></td>
+                <td>
+                  <div style="font-family:DM Mono,monospace">${(row.count||0).toLocaleString()}</div>
+                  <div class="vol-bar"><div class="vol-fill" style="width:${max?Math.round((row.count||0)/max*100):0}%"></div></div>
+                </td>
+                <td style="font-family:DM Mono,monospace">${row.avg_favorers}</td>
+                <td style="font-family:DM Mono,monospace">${row.avg_views}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(e) { area.innerHTML = `<div style="padding:20px;color:var(--red)">Error: ${escHtml(e.message)}</div>`; }
+}// ===================== NAVIGATION =====================
 function navigateTo(pageId) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
