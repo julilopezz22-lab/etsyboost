@@ -1,7 +1,5 @@
-const API_KEY = process.env.ETSY_API_KEY;   // keystring: a6hs9rn9rx9t4dyja72xwmpc
-const API_SECRET = process.env.ETSY_SECRET; // shared secret
+const API_KEY = process.env.ETSY_API_KEY;   // a6hs9rn9rx9t4dyja72xwmpc
 
-// julietshopp known shop_id
 const SHOP_IDS = {
   'julietshopp': 46057141,
 };
@@ -14,25 +12,25 @@ export default async function handler(req, res) {
 
   const { shop, offset = 0, limit = 25 } = req.query;
   if (!shop) return res.status(400).json({ error: 'Shop name required' });
-  if (!API_KEY) return res.status(500).json({ error: 'ETSY_API_KEY not configured' });
+  if (!API_KEY) return res.status(500).json({ error: 'ETSY_API_KEY not configured. Current value: MISSING' });
 
   const shopKey = shop.toLowerCase().trim();
   const shopId = SHOP_IDS[shopKey];
 
   if (!shopId) {
-    return res.status(404).json({ 
-      error: `Shop "${shop}" not found. Available: ${Object.keys(SHOP_IDS).join(', ')}`
-    });
+    return res.status(404).json({ error: `Shop "${shop}" not cached.` });
   }
 
-  // Etsy v3 API - try with just keystring first (for public endpoints)
+  // Debug: show what API key is being used (first 6 chars only)
+  const keyPreview = API_KEY ? API_KEY.substring(0, 6) + '...' : 'EMPTY';
+
   const headers = { 
-    'x-api-key': API_KEY,
+    'x-api-key': API_KEY.trim(),
     'Accept': 'application/json'
   };
 
   try {
-    // Public listings endpoint - works with just API key for public data
+    // Try Etsy v3 public listings endpoint
     const url = `https://openapi.etsy.com/v3/application/listings/active?shop_id=${shopId}&limit=${limit}&offset=${offset}&includes=Images,MainImage`;
     
     const listRes = await fetch(url, { headers });
@@ -44,8 +42,9 @@ export default async function handler(req, res) {
       
       return res.status(listRes.status).json({ 
         error: errJson.error || errJson.error_description || `Etsy API ${listRes.status}`,
-        detail: errText.substring(0, 200),
+        detail: errText.substring(0, 300),
         shop_id: shopId,
+        key_preview: keyPreview,
         url_tried: url
       });
     }
@@ -72,9 +71,10 @@ export default async function handler(req, res) {
       count: data.count || 0,
       results,
       shop_id: shopId,
-      shop_name: shop
+      shop_name: shop,
+      key_preview: keyPreview
     });
   } catch (e) {
-    return res.status(500).json({ error: e.message });
+    return res.status(500).json({ error: e.message, key_preview: keyPreview });
   }
 }
