@@ -1099,13 +1099,13 @@ function runGrader() {
     '<div class="msec"><div class="mlbl">TAGS ('+currentGraderTags.length+'/13)</div>'+
     (currentGraderTags.length?'<div class="mtags" style="margin-bottom:8px">'+currentGraderTags.map(t=>'<span class="mtag ltag">'+escHtml(t)+' <span style="opacity:.5;font-size:9px">'+t.length+'</span></span>').join('')+'</div>':'')+
     '<div class="missues">'+gR.issues.map(i=>'<div class="miss '+i.type+'"><span>'+i.icon+'</span><span>'+i.msg+'</span></div>').join('')+'</div>'+
-    (newSug.length?'<div style="margin-top:10px"><div class="nano-lbl">💡 Add these tags to fill remaining slots</div><div class="mtags">'+newSug.map(s=>'<span class="mtag ltag" style="cursor:pointer;border-color:var(--blue)" onclick="if(currentGraderTags.length<13){currentGraderTags.push(''+s+'');renderTagPills();this.style.background='var(--green-dim)';this.style.borderColor='var(--green)';this.style.color='var(--green)'}">+ '+escHtml(s)+'</span>').join('')+'</div></div>':'')+'</div>'+
+    (newSug.length?'<div style="margin-top:10px"><div class="nano-lbl">💡 Add these tags to fill remaining slots</div><div class="mtags">'+newSug.map(s=>'<span class="mtag ltag" style="cursor:pointer;border-color:var(--blue)" onclick="if(currentGraderTags.length<13){currentGraderTags.push(s);renderTagPills();this.classList.add('active')}">+ '+escHtml(s)+'</span>').join('')+'</div></div>':'')+'</div>'+
     '<div class="msec"><div class="mlbl">OPTIMIZED TITLE SUGGESTION</div>'+
     '<div class="opt-title-box">'+escHtml(ot)+'</div>'+
-    '<button class="cbtn" onclick="navigator.clipboard.writeText(''+ot.replace(/'/g,"\'")+'')" >📋 Copy Optimized Title</button></div>'+
+    '<button class="cbtn" onclick="navigator.clipboard.writeText(ot)" >📋 Copy Optimized Title</button></div>'+
     '<div class="msec"><div class="mlbl">AI PHOTO PROMPT</div>'+
     '<div class="nano-box"><div class="nano-lbl">✨ Paste into Gemini or Midjourney</div><div class="nano-txt">'+escHtml(nb)+'</div></div>'+
-    '<button class="cbtn secondary" onclick="navigator.clipboard.writeText(''+nb.replace(/'/g,"\'")+'')" >📋 Copy AI Photo Prompt</button></div>';
+    '<button class="cbtn secondary" onclick="navigator.clipboard.writeText(nb)" >📋 Copy AI Photo Prompt</button></div>';
 }
 
 // ===================== HEALTH CHECK =====================
