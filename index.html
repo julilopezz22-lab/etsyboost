@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EtsyBoost — SEO Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
+<style>h
 :root{--bg:#0a0a0a;--bg2:#111;--bg3:#181818;--bg4:#1f1f1f;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--text:#f0f0f0;--text2:#777;--text3:#3a3a3a;--green:#1dbd6e;--green-dim:rgba(29,189,110,0.1);--amber:#f5a623;--amber-dim:rgba(245,166,35,0.1);--red:#ff4f4f;--red-dim:rgba(255,79,79,0.1);--accent:#1dbd6e;--blue:#4a9eff;--blue-dim:rgba(74,158,255,0.1);--purple:#9b59b6;--purple-dim:rgba(155,89,182,0.1);}
 *{box-sizing:border-box;margin:0;padding:0;}h
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;min-height:100vh;display:flex;}
@@ -1124,7 +1124,7 @@ async function runHealthCheck() {
         <div class="stat"><div class="sl">Con Problemas</div><div class="sv" style="color:var(--red)">${data.flagged_count}</div></div>
         <div class="stat"><div class="sl">Sin Problemas</div><div class="sv" style="color:var(--green)">${data.total - data.flagged_count}</div></div>
       </div>
-      ${data.flagged_count === 0 ? '<div style="padding:20px;background:var(--green-dim);border:1px solid var(--green);border-radius:10px;color:var(--green);text-align:center">✅ ¡Todo bien! Ningún listing tiene problemas.</div>' : ''}
+      ${data.flagged_count === 0 ? '<div style="padding:20px;background:var(--green-dim);border:1px solid var(--green);border-radius:10px;color:var(--green);text-align:center">✅ All good! No listings have issues.</div>' : ''}
       <div style="display:flex;flex-direction:column;gap:8px">
         ${(data.flagged || []).map(l => `
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px">
@@ -1151,8 +1151,8 @@ async function runBulkAnalysis() {
       <div class="stats-row" style="margin-bottom:20px">
         <div class="stat"><div class="sl">Total</div><div class="sv">${d.total}</div></div>
         <div class="stat"><div class="sl">Precio Promedio</div><div class="sv" style="color:var(--green)">$${d.price_stats?.avg}</div></div>
-        <div class="stat"><div class="sl">Precio Mín</div><div class="sv">$${d.price_stats?.min}</div></div>
-        <div class="stat"><div class="sl">Precio Máx</div><div class="sv">$${d.price_stats?.max}</div></div>
+        <div class="stat"><div class="sl">Precio Min</div><div class="sv">$${d.price_stats?.min}</div></div>
+        <div class="stat"><div class="sl">Precio Max</div><div class="sv">$${d.price_stats?.max}</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
@@ -1187,11 +1187,11 @@ async function runTopSellers() {
     if (d.error) { area.innerHTML = `<div style="padding:20px;color:var(--red)">Error: ${escHtml(JSON.stringify(d.error))}</div>`; return; }
     area.innerHTML = `
       <div style="margin-bottom:12px;font-size:12px;color:var(--text2)">
-        <strong style="color:var(--text)">${(d.total||0).toLocaleString()}</strong> resultados · Precio promedio top 25: <strong style="color:var(--green)">$${d.avg_price}</strong>
+        <strong style="color:var(--text)">${(d.total||0).toLocaleString()}</strong> resultados - Precio promedio top 25: <strong style="color:var(--green)">$${d.avg_price}</strong>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
-          <div class="mlbl">Tags más usados por top sellers</div>
+          <div class="mlbl">Tags mas usados por top sellers</div>
           <div class="mtags" style="margin-top:8px">
             ${(d.tag_insights||[]).map(({tag,count}) => `<span class="mtag ltag" style="cursor:pointer;border-color:var(--blue)" onclick="navigator.clipboard.writeText('${tag.replace(/'/g,"\\'")}');this.style.borderColor='var(--green)';this.style.color='var(--green)'">${escHtml(tag)} (${count})</span>`).join('')}
           </div>
@@ -1202,7 +1202,7 @@ async function runTopSellers() {
             ${(d.results||[]).slice(0,8).map(l => `
               <div style="font-size:11px;border-bottom:1px solid var(--border);padding-bottom:6px">
                 <a href="${l.url||'#'}" target="_blank" style="color:var(--text);text-decoration:none;font-weight:500">${escHtml((l.title||'').substring(0,55))}...</a>
-                <div style="color:var(--text2);margin-top:2px">$${l.price} · ❤️ ${l.num_favorers} · 👁 ${l.views}</div>
+                <div style="color:var(--text2);margin-top:2px">$${l.price}  | ❤️ ${l.num_favorers}  | 👁 ${l.views}</div>
               </div>`).join('')}
           </div>
         </div>
@@ -1298,8 +1298,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   initTagsInput();
   // Navigation
   document.querySelectorAll('.nav-item').forEach(btn=>{
-    btn.addEventListener('click',(e)=>{
-      e.preventDefault();
+price_stats?.max      e.preventDefault();
       const pg=btn.dataset.page;
       if(pg) navigateTo(pg);
     });
