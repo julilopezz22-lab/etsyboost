@@ -1,5 +1,10 @@
 const API_KEY = process.env.ETSY_API_KEY;
 
+// Known shop IDs cache - avoids extra API call
+const SHOP_IDS = {
+  'julietshopp': 46057141,
+};
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -11,33 +16,28 @@ export default async function handler(req, res) {
   if (!API_KEY) return res.status(500).json({ error: 'ETSY_API_KEY not configured' });
 
   const headers = { 'x-api-key': API_KEY, 'Accept': 'application/json' };
+  const shopKey = shop.toLowerCase().trim();
 
   try {
-    // Step 1: Get shop by name using the correct endpoint
-    const shopRes = await fetch(
-      `https://openapi.etsy.com/v3/application/shops/${encodeURIComponent(shop)}`,
-      { headers }
-    );
+    // Step 1: Get shop_id — use cache first, then API
+    let shopId = SHOP_IDS[shopKey] || null;
     
-    let shopId = null;
-    
-    if (shopRes.ok) {
-      const shopData = await shopRes.json();
-      shopId = shopData?.shop_id;
-    } else {
-      // Fallback: search by shop name
-      const searchRes = await fetch(
-        `https://openapi.etsy.com/v3/application/shops?shop_name=${encodeURIComponent(shop)}&limit=1`,
+    if (!shopId) {
+      // Try direct shop name endpoint
+      const shopRes = await fetch(
+        `https://openapi.etsy.com/v3/application/shops/${encodeURIComponent(shop)}`,
         { headers }
       );
-      if (searchRes.ok) {
-        const searchData = await searchRes.json();
-        shopId = searchData?.results?.[0]?.shop_id;
+      if (shopRes.ok) {
+        const shopData = await shopRes.json();
+        shopId = shopData?.shop_id;
       }
     }
 
     if (!shopId) {
-      return res.status(404).json({ error: `Shop "${shop}" not found on Etsy. Check the shop name.` });
+      return res.status(404).json({ 
+        error: `Shop "${shop}" not found. Make sure the shop name is exactly as it appears on Etsy.`
+      });
     }
 
     // Step 2: Fetch active listings with images
@@ -50,6 +50,7 @@ export default async function handler(req, res) {
       const err = await listRes.json().catch(() => ({}));
       return res.status(listRes.status).json({ 
         error: err.error_description || `Etsy API error: ${listRes.status}`,
+        hint: 'If 403, the listing data requires OAuth. Using public data only.',
         shop_id: shopId
       });
     }
