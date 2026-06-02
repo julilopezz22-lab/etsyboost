@@ -1,7 +1,11 @@
 {
-  "functions": {
-    "api/listings.js": {
-      "maxDuration": 30
+    "functions": {
+          "api/listings.js": { "maxDuration": 30 },
+          "api/keyword-explorer.js": { "maxDuration": 30 },
+          "api/top-sellers.js": { "maxDuration": 30 },
+          "api/trends.js": { "maxDuration": 30 },
+          "api/bulk-analysis.js": { "maxDuration": 30 },
+          "api/health-check.js": { "maxDuration": 30 },
+          "api/shop-info.js": { "maxDuration": 30 }
     }
-  }
 }
