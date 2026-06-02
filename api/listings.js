@@ -1,6 +1,7 @@
-const API_KEY = process.env.ETSY_API_KEY;
+const API_KEY = process.env.ETSY_API_KEY;   // keystring: a6hs9rn9rx9t4dyja72xwmpc
+const API_SECRET = process.env.ETSY_SECRET; // shared secret
 
-// julietshopp shop_id (from Etsy page)
+// julietshopp known shop_id
 const SHOP_IDS = {
   'julietshopp': 46057141,
 };
@@ -15,40 +16,41 @@ export default async function handler(req, res) {
   if (!shop) return res.status(400).json({ error: 'Shop name required' });
   if (!API_KEY) return res.status(500).json({ error: 'ETSY_API_KEY not configured' });
 
-  const headers = { 'x-api-key': API_KEY, 'Accept': 'application/json' };
   const shopKey = shop.toLowerCase().trim();
   const shopId = SHOP_IDS[shopKey];
 
   if (!shopId) {
     return res.status(404).json({ 
-      error: `Shop "${shop}" not in cache. Contact admin to add this shop.`,
-      available: Object.keys(SHOP_IDS)
+      error: `Shop "${shop}" not found. Available: ${Object.keys(SHOP_IDS).join(', ')}`
     });
   }
 
+  // Etsy v3 API - try with just keystring first (for public endpoints)
+  const headers = { 
+    'x-api-key': API_KEY,
+    'Accept': 'application/json'
+  };
+
   try {
-    // Use the public listings endpoint with shop_id filter (no OAuth needed)
-    const listRes = await fetch(
-      `https://openapi.etsy.com/v3/application/listings/active?shop_id=${shopId}&limit=${limit}&offset=${offset}&includes=Images,MainImage`,
-      { headers }
-    );
+    // Public listings endpoint - works with just API key for public data
+    const url = `https://openapi.etsy.com/v3/application/listings/active?shop_id=${shopId}&limit=${limit}&offset=${offset}&includes=Images,MainImage`;
+    
+    const listRes = await fetch(url, { headers });
     
     if (!listRes.ok) {
       const errText = await listRes.text();
       let errJson = {};
       try { errJson = JSON.parse(errText); } catch(e) {}
       
-      // If still 403, the key needs different scopes
       return res.status(listRes.status).json({ 
-        error: errJson.error_description || errJson.error || `Etsy API ${listRes.status}`,
-        raw: errText.substring(0, 300),
+        error: errJson.error || errJson.error_description || `Etsy API ${listRes.status}`,
+        detail: errText.substring(0, 200),
         shop_id: shopId,
-        hint: 'API key may need OAuth scopes. Check Etsy developer console.'
+        url_tried: url
       });
     }
     
     const data = await listRes.json();
-
     const results = (data.results || []).map(l => ({
       listing_id: l.listing_id,
       title: l.title,
@@ -73,6 +75,6 @@ export default async function handler(req, res) {
       shop_name: shop
     });
   } catch (e) {
-    return res.status(500).json({ error: e.message, stack: e.stack });
+    return res.status(500).json({ error: e.message });
   }
 }
