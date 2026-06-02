@@ -1,4 +1,5 @@
-const API_KEY = process.env.ETSY_API_KEY;   // a6hs9rn9rx9t4dyja72xwmpc
+const API_KEY = process.env.ETSY_API_KEY;     // keystring: a6hs9rn9rx9t4dyja72xwmpc
+const API_SECRET = process.env.ETSY_SECRET;   // shared secret: lpggidhncm
 
 const SHOP_IDS = {
   'julietshopp': 46057141,
@@ -12,7 +13,7 @@ export default async function handler(req, res) {
 
   const { shop, offset = 0, limit = 25 } = req.query;
   if (!shop) return res.status(400).json({ error: 'Shop name required' });
-  if (!API_KEY) return res.status(500).json({ error: 'ETSY_API_KEY not configured. Current value: MISSING' });
+  if (!API_KEY) return res.status(500).json({ error: 'ETSY_API_KEY not configured' });
 
   const shopKey = shop.toLowerCase().trim();
   const shopId = SHOP_IDS[shopKey];
@@ -21,18 +22,17 @@ export default async function handler(req, res) {
     return res.status(404).json({ error: `Shop "${shop}" not cached.` });
   }
 
-  // Debug: show what API key is being used (first 6 chars only)
-  const keyPreview = API_KEY ? API_KEY.substring(0, 6) + '...' : 'EMPTY';
+  // Etsy v3 API requires both keystring and shared secret in x-api-key header
+  // Format: "keystring:sharedsecret" or just keystring for some endpoints
+  const authKey = API_SECRET ? `${API_KEY.trim()}:${API_SECRET.trim()}` : API_KEY.trim();
 
   const headers = { 
-    'x-api-key': API_KEY.trim(),
+    'x-api-key': authKey,
     'Accept': 'application/json'
   };
 
   try {
-    // Try Etsy v3 public listings endpoint
     const url = `https://openapi.etsy.com/v3/application/listings/active?shop_id=${shopId}&limit=${limit}&offset=${offset}&includes=Images,MainImage`;
-    
     const listRes = await fetch(url, { headers });
     
     if (!listRes.ok) {
@@ -44,8 +44,7 @@ export default async function handler(req, res) {
         error: errJson.error || errJson.error_description || `Etsy API ${listRes.status}`,
         detail: errText.substring(0, 300),
         shop_id: shopId,
-        key_preview: keyPreview,
-        url_tried: url
+        auth_format: API_SECRET ? 'key:secret' : 'key-only'
       });
     }
     
@@ -71,10 +70,9 @@ export default async function handler(req, res) {
       count: data.count || 0,
       results,
       shop_id: shopId,
-      shop_name: shop,
-      key_preview: keyPreview
+      shop_name: shop
     });
   } catch (e) {
-    return res.status(500).json({ error: e.message, key_preview: keyPreview });
+    return res.status(500).json({ error: e.message });
   }
 }
