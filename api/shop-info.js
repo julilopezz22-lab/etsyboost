@@ -1,31 +1,69 @@
-const API_KEY = process.env.ETSY_API_KEY;
+const SHOP_IDS = {
+    'julietshopp': 46057141,
+};
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  if (req.method === 'OPTIONS') return res.status(200).end();
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { shop } = req.query;
-  if (!shop) return res.status(400).json({ error: 'shop requerido' });
+  const shop = (req.query.shop || '').toLowerCase().trim();
+    if (!shop) return res.status(400).json({ error: 'shop requerido' });
+
+  const API_KEY = process.env.ETSY_API_KEY || '';
+    if (!API_KEY) return res.status(500).json({ error: 'ETSY_API_KEY not configured' });
+
+  const shopId = SHOP_IDS[shop];
 
   try {
-    const r = await fetch(
-      `https://openapi.etsy.com/v3/application/shops?shop_name=${shop}`,
-      { headers: { 'x-api-key': API_KEY, 'Accept': 'application/json' } }
-    );
-    const data = await r.json();
-    const s = data?.results?.[0];
-    if (!s) return res.status(404).json({ exists: false, error: 'Shop no encontrada' });
+        if (shopId) {
+                const [shopRes, listRes] = await Promise.all([
+                          fetch('https://openapi.etsy.com/v3/application/shops/' + shopId,
+                                { headers: { 'x-api-key': API_KEY, 'Accept': 'application/json' } }),
+                          fetch('https://openapi.etsy.com/v3/application/shops/' + shopId + '/listings/active?limit=1',
+                                { headers: { 'x-api-key': API_KEY, 'Accept': 'application/json' } })
+                        ]);
+                const shopData = shopRes.ok ? await shopRes.json() : {};
+                const listData = listRes.ok ? await listRes.json() : { count: 0 };
+                return res.status(200).json({
+                          exists: true,
+                          shop_id: shopId,
+                          shop_name: shopData.shop_name || shop,
+                          title: shopData.title || '',
+                          listing_count: listData.count || 0,
+                          sale_count: shopData.transaction_sold_count || 0,
+                          review_count: shopData.review_count || 0,
+                          review_average: shopData.review_average || 0
+                });
+        }
 
-    return res.status(200).json({
-      exists: true,
-      shop_id: s.shop_id,
-      shop_name: s.shop_name,
-      title: s.title,
-      listing_active_count: s.listing_active_count,
-      currency_code: s.currency_code,
-      url: s.url
-    });
+      const r = await fetch(
+              'https://openapi.etsy.com/v3/application/shops?shop_name=' + encodeURIComponent(shop),
+        { headers: { 'x-api-key': API_KEY, 'Accept': 'application/json' } }
+            );
+        if (!r.ok) return res.status(404).json({ exists: false, error: 'Shop no encontrada' });
+        const d = await r.json();
+        const shopData = d.results && d.results[0];
+        if (!shopData) return res.status(404).json({ exists: false, error: 'Shop no encontrada' });
+
+      const lr = await fetch(
+              'https://openapi.etsy.com/v3/application/shops/' + shopData.shop_id + '/listings/active?limit=1',
+        { headers: { 'x-api-key': API_KEY, 'Accept': 'application/json' } }
+            );
+        const ld = lr.ok ? await lr.json() : { count: 0 };
+
+      return res.status(200).json({
+              exists: true,
+              shop_id: shopData.shop_id,
+              shop_name: shopData.shop_name,
+              title: shopData.title || '',
+              listing_count: ld.count || 0,
+              sale_count: shopData.transaction_sold_count || 0,
+              review_count: shopData.review_count || 0,
+              review_average: shopData.review_average || 0
+      });
   } catch (e) {
-    return res.status(500).json({ error: e.message });
+        return res.status(500).json({ error: e.message });
   }
 }
