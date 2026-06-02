@@ -337,8 +337,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
     </div>
   </div>
-
-  <!-- TRENDING TAGS PAGE -->
+onclick="filterTrends('seasonal',this)">🌸 Seasonal</button>
+  <button class="fchip" onclick="filterTrends('yours',this)">⭐ Your Tags</button>
+</div>div><!-- TRENDING TAGS PAGE -->
   <div class="page" id="page-trending">
     <div class="page-header">
       <div class="page-title">Trending Tags</div>
@@ -747,11 +748,11 @@ const KW_DATA = {
 };
 const DEFAULT_KW = [{kw:'real flower necklace',vol:8900,comp:62,trend:'↑'},{kw:'botanical jewelry',vol:12400,comp:78,trend:'↑'},{kw:'pressed flower jewelry',vol:6200,comp:55,trend:'→'},{kw:'resin flower jewelry',vol:4800,comp:48,trend:'↑'},{kw:'preserved flower necklace',vol:3900,comp:42,trend:'↑'},{kw:'flower pendant necklace',vol:5600,comp:60,trend:'→'},{kw:'handmade flower earrings',vol:3200,comp:38,trend:'↑'},{kw:'cottagecore jewelry',vol:9800,comp:72,trend:'↑'},{kw:'floral resin ring',vol:2800,comp:35,trend:'↑'},{kw:'nature jewelry gift',vol:7100,comp:65,trend:'→'}];
 
-function searchKeywords() {
+async function searchKeywords() {
   const q=(document.getElementById('kw-search-input').value||'').trim().toLowerCase();
   const area=document.getElementById('kw-results-area');
   if(!q){area.innerHTML='<div style="padding:20px;color:var(--text2)">Please enter a keyword to search.</div>';return;}
-  area.innerHTML='<div class="loading"><div class="spin"></div><p>Analyzing keyword data...</p></div>';
+  area.innerHTML='<div class="loading"><div class="spin"></div><p>Fetching real Etsy data...</p></div>';
   setTimeout(()=>{
     let results=KW_DATA[q]||DEFAULT_KW;
     // Generate variations if no exact match
@@ -906,7 +907,7 @@ function renderCompetitors(data) {
   }).join('');
 }
 
-function searchCompetitors() {
+async function searchCompetitors() {
   const q = (document.getElementById('comp-search-input')?.value||'').trim();
   renderCompetitors(COMP_DATA);
 }
@@ -1258,7 +1259,7 @@ function navigateTo(pageId) {
 
 // ===================== DATA LOADING =====================
 async function loadListings(offset=0) {
-  const res=await fetch('/api/etsy-listings?shop='+SHOP+'&limit=25&offset='+offset);
+  const res=await fetch('/api/listings?shop='+SHOP+'&limit=25&offset='+offset);
   if(!res.ok){const err=await res.json();throw new Error(err.error||'HTTP '+res.status);}
   return await res.json();
 }
