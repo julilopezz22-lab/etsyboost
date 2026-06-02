@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0a0a;--bg2:#111;--bg3:#181818;--bg4:#1f1f1f;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--text:#f0f0f0;--text2:#777;--text3:#3a3a3a;--green:#1dbd6e;--green-dim:rgba(29,189,110,0.1);--amber:#f5a623;--amber-dim:rgba(245,166,35,0.1);--red:#ff4f4f;--red-dim:rgba(255,79,79,0.1);--accent:#1dbd6e;--blue:#4a9eff;--blue-dim:rgba(74,158,255,0.1);--purple:#9b59b6;--purple-dim:rgba(155,89,182,0.1);}
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;}h
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;min-height:100vh;display:flex;}
 .sidebar{width:210px;min-width:210px;background:var(--bg2);border-right:1px solid var(--border);height:100vh;position:sticky;top:0;display:flex;flex-direction:column;overflow-y:auto;}
 .logo{display:flex;align-items:center;gap:8px;padding:16px 16px 12px;}
@@ -1254,6 +1254,8 @@ function navigateTo(pageId) {
   if(pageId==='trending') renderTrends('all');
   if(pageId==='tag-report') renderTagReport();
   if(pageId==='competitors') renderCompetitors(COMP_DATA);
+    if(pageId==='health-check') runHealthCheck();
+    if(pageId==='bulk-analysis') runBulkAnalysis();
   if(pageId==='shop-analyzer' && allListings.length) { /* ready */ }
 }
 
