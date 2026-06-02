@@ -1,57 +1,74 @@
-const API_KEY = process.env.ETSY_API_KEY;
+const SHOP_IDS = {
+    'julietshopp': 46057141,
+};
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  if (req.method === 'OPTIONS') return res.status(200).end();
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { shop } = req.query;
-  if (!shop) return res.status(400).json({ error: 'Shop required' });
+  const shop = (req.query.shop || '').toLowerCase().trim();
+    if (!shop) return res.status(400).json({ error: 'Shop required' });
+
+  const API_KEY = process.env.ETSY_API_KEY || '';
+    if (!API_KEY) return res.status(500).json({ error: 'ETSY_API_KEY not configured' });
+
+  const shopId = SHOP_IDS[shop];
+    if (!shopId) {
+          return res.status(404).json({ error: shop + ' not found. Available: ' + Object.keys(SHOP_IDS).join(', ') });
+    }
 
   try {
-    const shopRes = await fetch(
-      `https://openapi.etsy.com/v3/application/shops?shop_name=${shop}`,
-      { headers: { 'x-api-key': API_KEY, 'Accept': 'application/json' } }
-    );
-    const shopData = await shopRes.json();
-    const shopId = shopData?.results?.[0]?.shop_id;
-    if (!shopId) return res.status(404).json({ error: 'Shop not found' });
+        let allListings = [];
+        let offset = 0;
+        let total = null;
 
-    let allListings = [];
-    let offset = 0;
-    let total = 0;
+      do {
+              const r = await fetch(
+                        'https://openapi.etsy.com/v3/application/shops/' + shopId + '/listings/active?limit=100&offset=' + offset,
+                { headers: { 'x-api-key': API_KEY, 'Accept': 'application/json' } }
+                      );
+              if (!r.ok) {
+                        const errText = await r.text();
+                        return res.status(r.status).json({ error: 'Etsy API error', detail: errText.substring(0, 300) });
+              }
+              const d = await r.json();
+              if (total === null) total = d.count || 0;
+              allListings = allListings.concat(d.results || []);
+              offset += 100;
+      } while (allListings.length < total && offset < 500);
 
-    do {
-      const r = await fetch(
-        `https://openapi.etsy.com/v3/application/shops/${shopId}/listings/active?limit=100&offset=${offset}`,
-        { headers: { 'x-api-key': API_KEY, 'Accept': 'application/json' } }
-      );
-      const data = await r.json();
-      total = data.count || 0;
-      allListings = allListings.concat(data.results || []);
-      offset += 100;
-    } while (allListings.length < total && offset < 500);
+      const scored = allListings.map(l => {
+              const tags = l.tags || [];
+              const title = l.title || '';
+              const titleScore = Math.min(100, Math.round((title.length / 140) * 100));
+              const tagScore = Math.round((tags.length / 13) * 100);
+              const hasDesc = (l.description || '').length > 100 ? 100 : 50;
+              const overall = Math.round(titleScore * 0.4 + tagScore * 0.4 + hasDesc * 0.2);
+              return {
+                        listing_id: l.listing_id,
+                        title: l.title,
+                        url: l.url || 'https://www.etsy.com/listing/' + l.listing_id,
+                        score: overall,
+                        title_score: titleScore,
+                        tag_score: tagScore,
+                        tags_count: tags.length,
+                        views: l.views || 0,
+                        num_favorers: l.num_favorers || 0,
+                        price: l.price,
+                        state: l.state
+              };
+      });
 
-    const prices = allListings.map(l => parseFloat((l.price?.amount || 0) / (l.price?.divisor || 100)));
-    const avgPrice = prices.length ? (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2) : 0;
-    const maxPrice = Math.max(...prices).toFixed(2);
-    const minPrice = Math.min(...prices).toFixed(2);
+      scored.sort((a, b) => a.score - b.score);
 
-    const tagMap = {};
-    allListings.forEach(l => (l.tags || []).forEach(t => { tagMap[t] = (tagMap[t] || 0) + 1; }));
-    const topTags = Object.entries(tagMap).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([tag, count]) => ({ tag, count }));
-
-    const topByViews = [...allListings]
-      .sort((a, b) => (b.views || 0) - (a.views || 0))
-      .slice(0, 10)
-      .map(l => ({ id: l.listing_id, title: l.title, views: l.views || 0 }));
-
-    return res.status(200).json({
-      total: allListings.length,
-      price_stats: { avg: avgPrice, min: minPrice, max: maxPrice },
-      top_tags: topTags,
-      top_by_views: topByViews
-    });
+      return res.status(200).json({
+              shop,
+              total: allListings.length,
+              listings: scored
+      });
   } catch (e) {
-    return res.status(500).json({ error: e.message });
+        return res.status(500).json({ error: e.message });
   }
 }
