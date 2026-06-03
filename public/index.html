@@ -1315,11 +1315,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   init();
   initTagsInput();
   // Navigation
-  document.querySelectorAll('.nav-item').forEach(btn=>{
+  document.querySelectorAll('.nav-item').forEach(btn=>btn.addEventListener('click',(e)=>{
     e.preventDefault();
-      const pg=btn.dataset.page;
-      if(pg) navigateTo(pg);
-    });
+    const pg=btn.dataset.page;
+    if(pg) navigateTo(pg);
+  }));
   // Modal
   document.getElementById('mclose').onclick=()=>document.getElementById('modal').classList.remove('open');
   document.getElementById('modal').onclick=(e)=>{if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');};
