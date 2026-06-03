@@ -1139,10 +1139,10 @@ async function runHealthCheck() {
     area.innerHTML = `
       <div class="stats-row" style="margin-bottom:20px">
         <div class="stat"><div class="sl">Total Listings</div><div class="sv">${data.total}</div></div>
-        <div class="stat"><div class="sl">Con Problemas</div><div class="sv" style="color:var(--red)">${data.flagged_count}</div></div>
-        <div class="stat"><div class="sl">Sin Problemas</div><div class="sv" style="color:var(--green)">${data.total - data.flagged_count}</div></div>
+        <div class="stat"><div class="sl">Con Problemas</div><div class="sv" style="color:var(--red)">${data.total_issues}</div></div>
+        <div class="stat"><div class="sl">Sin Problemas</div><div class="sv" style="color:var(--green)">${data.total - data.total_issues}</div></div>
       </div>
-      ${data.flagged_count === 0 ? '<div style="padding:20px;background:var(--green-dim);border:1px solid var(--green);border-radius:10px;color:var(--green);text-align:center">â All good! No listings have issues.</div>' : ''}
+      ${data.total_issues === 0 ? '<div style="padding:20px;background:var(--green-dim);border:1px solid var(--green);border-radius:10px;color:var(--green);text-align:center">â All good! No listings have issues.</div>' : ''}
       <div style="display:flex;flex-direction:column;gap:8px">
         ${(data.flagged || []).map(l => `
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px">
