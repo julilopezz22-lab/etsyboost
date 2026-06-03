@@ -5,6 +5,18 @@ const SHOP_IDS = {
   'julietshopp': 46057141,
 };
 
+// Helper: fetch with retry on 429
+async function fetchWithRetry(url, opts, retries = 2) {
+  for (let i = 0; i <= retries; i++) {
+    const r = await fetch(url, opts);
+    if (r.status === 429 && i < retries) {
+      await new Promise(res => setTimeout(res, 500 * (i + 1)));
+      continue;
+    }
+    return r;
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
@@ -31,7 +43,7 @@ export default async function handler(req, res) {
 
     // Step 1: get listings
     const listUrl = 'https://openapi.etsy.com/v3/application/shops/' + shopId + '/listings/active?limit=' + limit + '&offset=' + offset;
-    const listRes = await fetch(listUrl, { headers });
+    const listRes = await fetchWithRetry(listUrl, { headers });
     if (!listRes.ok) {
       const errText = await listRes.text();
       return res.status(listRes.status).json({ error: 'Etsy API ' + listRes.status, detail: errText.substring(0, 300) });
@@ -39,26 +51,32 @@ export default async function handler(req, res) {
     const data = await listRes.json();
     const listings = data.results || [];
 
-    // Step 2: fetch images in parallel for all listings
-    // Using /v3/application/listings/{id}/images endpoint (public, no OAuth needed)
+    // Step 2: fetch images in small batches (5 at a time) to stay within rate limits
     const imageMap = {};
-    if (listings.length > 0) {
-      const imageFetches = listings.map(async l => {
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < listings.length; i += BATCH_SIZE) {
+      const batch = listings.slice(i, i + BATCH_SIZE);
+      await Promise.all(batch.map(async l => {
         try {
-          const imgRes = await fetch('https://openapi.etsy.com/v3/application/listings/' + l.listing_id + '/images', { headers });
-          if (imgRes.ok) {
+          const imgRes = await fetchWithRetry(
+            'https://openapi.etsy.com/v3/application/listings/' + l.listing_id + '/images',
+            { headers }
+          );
+          if (imgRes && imgRes.ok) {
             const imgData = await imgRes.json();
             imageMap[l.listing_id] = imgData.results || [];
           }
         } catch(e) {}
-      });
-      await Promise.all(imageFetches);
+      }));
+      // Small delay between batches to avoid rate limit
+      if (i + BATCH_SIZE < listings.length) {
+        await new Promise(res => setTimeout(res, 200));
+      }
     }
 
     // Step 3: merge
     const results = listings.map(l => {
       const imgs = imageMap[l.listing_id] || [];
-      const mainImg = imgs[0] || null;
       return {
         listing_id: l.listing_id,
         title: l.title,
@@ -70,7 +88,7 @@ export default async function handler(req, res) {
         quantity: l.quantity,
         state: l.state,
         url: l.url,
-        primary_image: mainImg,
+        primary_image: imgs[0] || null,
         images: imgs,
         created_timestamp: l.created_timestamp,
         last_modified_timestamp: l.last_modified_timestamp
