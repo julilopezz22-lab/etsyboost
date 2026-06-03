@@ -7,16 +7,22 @@ module.exports = async (req, res) => {
 
   let etsyResults = [];
   let listingCount = 0;
+  let debugInfo = '';
 
   try {
-    const r = await fetch(
-      'https://openapi.etsy.com/v3/application/listings/active?keywords=' +
-        encodeURIComponent(keyword) + '&limit=25&sort_on=score',
-      { headers: { 'x-api-key': ETSY_KEY, 'Accept': 'application/json' } }
-    );
+    const url = 'https://openapi.etsy.com/v3/application/listings/active?keywords=' +
+        encodeURIComponent(keyword) + '&limit=25&sort_on=score&includes=Images';
+    const r = await fetch(url, {
+      headers: {
+        'x-api-key': 'a6hs9rn9rx9t4dyja72xwmpc',
+        'Accept': 'application/json'
+      }
+    });
+    debugInfo = 'status:' + r.status;
     if (r.ok) {
       const d = await r.json();
       listingCount = d.count || 0;
+      debugInfo += ' count:' + listingCount;
       etsyResults = (d.results || []).slice(0, 10).map(l => ({
         listing_id: l.listing_id,
         title: l.title,
@@ -28,10 +34,14 @@ module.exports = async (req, res) => {
         url: 'https://www.etsy.com/listing/' + l.listing_id,
         shop_name: l.shop_id || '',
         tags: l.tags || [],
-        image_url: l.images?.[0]?.url_170x135 || ''
+        image_url: (l.images && l.images[0]) ? l.images[0].url_170x135 : ''
       }));
+    } else {
+      const errText = await r.text();
+      debugInfo += ' err:' + errText.substring(0, 100);
     }
   } catch (e) {
+    debugInfo = 'exception:' + e.message;
     console.error('Etsy search error:', e.message);
   }
 
@@ -70,6 +80,7 @@ module.exports = async (req, res) => {
     competition_score: compScore,
     avg_price: avgPrice,
     top_listings: etsyResults,
-    related_keywords: related.slice(0, 8)
+    related_keywords: related.slice(0, 8),
+    _debug: debugInfo
   });
 };
