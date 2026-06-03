@@ -1279,7 +1279,7 @@ function navigateTo(pageId) {
 
 // ===================== DATA LOADING =====================
 async function loadListings(offset=0) {
-  const res=await fetch('/api/listings?shop='+SHOP+'&limit=100&offset='+offset);
+  const res=await fetch('/api/listings?shop='+SHOP);
   if(!res.ok){const err=await res.json();throw new Error(err.error||'HTTP '+res.status);}
   return await res.json();
 }
