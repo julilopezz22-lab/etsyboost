@@ -603,7 +603,7 @@ function scoreListings(listings) {
     const type=detectType(l.title);
     const tR=analyzeTitle(l.title);
     const gR=analyzeTags(l.tags||[],l.title);
-    const price=l.price?(l.price.amount/l.price.divisor).toFixed(2):'0';
+    const price=l.price?(typeof l.price === 'string' ? parseFloat(l.price) : (l.price.amount/l.price.divisor)).toFixed(2):'0';
     const pR=analyzePrice('$'+price,type);
     l._score=overall(tR.score,gR.score,pR.score);
     l._price=price;
@@ -906,7 +906,7 @@ async function searchCompetitors() {
     if(!listings.length) { grid.innerHTML = '<div style="color:var(--text2);padding:20px">No results found.</div>'; return; }
     grid.innerHTML = listings.slice(0,6).map((l,i) => {
       const emojis = ['ð¿','ð¸','ð','ðº','ð±','ð'];
-      const price = l.price ? (l.price.amount/l.price.divisor).toFixed(2) : '--';
+      const price = l.price ? (typeof l.price === 'string' ? parseFloat(l.price) : (l.price.amount/l.price.divisor)).toFixed(2) : '--';
       return '<div class="comp-card">'+
         '<div class="comp-header">'+
         '<div class="comp-avatar">'+emojis[i]+'</div>'+
