@@ -797,7 +797,7 @@ async function loadTrendingTags() {
     if (!res.ok) throw new Error('API error ' + res.status);
     const d = await res.json();
     if (d.trends && d.trends.length) {
-      _trendingDataCache = d.trends.map(t => ({
+      _trendingDataCache = d.trends.filter(t => (t.count||0) > 0).map(t => ({
         tag: t.keyword,
         cat: (t.keyword.includes('botanical')||t.keyword.includes('flower')||t.keyword.includes('orchid')||t.keyword.includes('resin')) ? 'botanical' :
              (t.keyword.includes('gift')||t.keyword.includes('bridal')) ? 'gift' :
