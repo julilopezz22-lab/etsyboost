@@ -614,7 +614,7 @@ function scoreListings(listings) {
 
 // ===================== LISTINGS PAGE =====================
 function renderStats(listings) {
-  const total=listings.length;
+  const total=totalCount||listings.length;
   const needsWork=listings.filter(l=>l._score<50).length;
   const totalViews=listings.reduce((s,l)=>s+(l.views||0),0);
   const avgPrice=total?(listings.reduce((s,l)=>s+parseFloat(l._price||0),0)/total).toFixed(2):0;
@@ -1279,7 +1279,7 @@ function navigateTo(pageId) {
 
 // ===================== DATA LOADING =====================
 async function loadListings(offset=0) {
-  const res=await fetch('/api/listings?shop='+SHOP+'&limit=25&offset='+offset);
+  const res=await fetch('/api/listings?shop='+SHOP+'&limit=100&offset='+offset);
   if(!res.ok){const err=await res.json();throw new Error(err.error||'HTTP '+res.status);}
   return await res.json();
 }
