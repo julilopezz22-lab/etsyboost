@@ -715,7 +715,7 @@ function openModal(l) {
     '<div class="msec"><div class="mlbl">TAGS ('+((l.tags||[]).length)+'/13)</div>'+
     '<div class="mtags" style="margin-bottom:8px">'+((l.tags||[]).map(t=>'<span class="mtag ltag '+(badSet.has(t)?'bad':warnSet.has(t)?'warn':'')+'">'+escHtml(t)+' <span style="opacity:.5;font-size:9px">'+t.length+'</span></span>')).join('')+(!((l.tags||[]).length)?'<span style="color:var(--red);font-size:12px">No tags found</span>':'')+'</div>'+
     '<div class="missues">'+gR.issues.map(i=>'<div class="miss '+i.type+'"><span>'+i.icon+'</span><span>'+i.msg+'</span></div>').join('')+'</div>'+
-    (newSug.length?'<div style="margin-top:10px"><div class="nano-lbl">ð¡ Suggested new tags</div><div class="mtags">'+newSug.map(s=>'<span class="mtag ltag" style="cursor:pointer;border-color:var(--blue)" onclick="this.classList.add('kw-selected')">+ '+escHtml(s)+'</span>').join('')+'</div></div>':'')+'</div>'+
+    (newSug.length?'<div style="margin-top:10px"><div class="nano-lbl">ð¡ Suggested new tags</div><div class="mtags">'+newSug.map(s=>'<span class="mtag ltag" style="cursor:pointer;border-color:var(--blue)" onclick="this.classList.add(\'kw-selected\')">+ '+escHtml(s)+'</span>').join('')+'</div></div>':'')+'</div>'+
     '<div class="msec"><div class="mlbl">PRICE ANALYSIS</div>'+
     '<div class="pgrid">'+
     '<div class="pcell"><div class="pl">Your Price</div><div class="pv" style="color:'+(pR.current<pR.ideal-10?'var(--red)':'var(--text)')+'">$'+pR.current+'</div></div>'+
