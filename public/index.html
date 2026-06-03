@@ -834,7 +834,7 @@ function renderTrends(filter) {
   grid.innerHTML = data.map(t=>{
     const badgeClass = t.status==='hot'?'trend-hot':t.status==='up'?'trend-up':t.status==='warm'?'trend-warm':'trend-cool';
     const badgeText = t.status==='hot'?'🔥 Hot':t.status==='up'?'⬆️ Rising':t.status==='warm'?'🟡 Warm':'🔵 Cool';
-    return '<div class="trend-card" onclick="navigator.clipboard.writeText(this.querySelector('.trend-tag').textContent)">'+
+    return '<div class="trend-card" onclick="navigator.clipboard.writeText(this.children[0].textContent)">'+
       '<div class="trend-tag">'+escHtml(t.tag)+'</div>'+
       '<div class="trend-meta">'+
       '<span>'+((t.vol||0).toLocaleString())+' listings</span>'+
