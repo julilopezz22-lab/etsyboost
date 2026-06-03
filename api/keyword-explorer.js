@@ -5,6 +5,8 @@ module.exports = async (req, res) => {
 
   const KEYSTRING = process.env.ETSY_KEYSTRING || 'a6hs9rn9rx9t4dyja72xwmpc';
   const SHARED_SECRET = process.env.ETSY_SHARED_SECRET || 'lpggidhncm';
+  // Etsy v3 public API requires x-api-key in format "keystring:sharedsecret"
+  const API_HEADER = KEYSTRING + ':' + SHARED_SECRET;
 
   let etsyResults = [];
   let listingCount = 0;
@@ -15,8 +17,7 @@ module.exports = async (req, res) => {
         encodeURIComponent(keyword) + '&limit=25&sort_on=score&includes=Images';
     const r = await fetch(url, {
       headers: {
-        'x-api-key': KEYSTRING,
-        'Authorization': 'Basic ' + Buffer.from(KEYSTRING + ':' + SHARED_SECRET).toString('base64'),
+        'x-api-key': API_HEADER,
         'Accept': 'application/json'
       }
     });
