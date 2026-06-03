@@ -787,7 +787,7 @@ let _trendingDataCache = null;
 let _trendingCurrentFilter = 'all';
 
 async function loadTrendingTags() {
-  const grid = document.getElementById('trending-grid');
+  const grid = document.getElementById('trend-grid');
   if (!grid) return;
   if (_trendingDataCache) { renderTrends(_trendingCurrentFilter); return; }
   grid.innerHTML = '<div class="loading"><div class="spin"></div><p>Loading trending tags from Etsy...</p></div>';
@@ -829,7 +829,7 @@ function getFallbackTrends() {
 function renderTrends(filter) {
   _trendingCurrentFilter = filter || 'all';
   const data = (_trendingDataCache || getFallbackTrends()).filter(t => _trendingCurrentFilter==='all' || t.cat===_trendingCurrentFilter);
-  const grid = document.getElementById('trending-grid');
+  const grid = document.getElementById('trend-grid');
   if(!grid) return;
   grid.innerHTML = data.map(t=>{
     const badgeClass = t.status==='hot'?'trend-hot':t.status==='up'?'trend-up':t.status==='warm'?'trend-warm':'trend-cool';
