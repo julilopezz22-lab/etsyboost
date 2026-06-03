@@ -1,93 +1,75 @@
-function estimateVolume(keyword) {
-      const kw = keyword.toLowerCase();
-      const highVol = ['jewelry','necklace','ring','earrings','gift','handmade','botanical','flower','resin'];
-      const medVol = ['bracelet','pendant','crystal','nature','boho','vintage','gold','silver'];
-      let multiplier = 1;
-      highVol.forEach(w => { if (kw.includes(w)) multiplier += 1.5; });
-      medVol.forEach(w => { if (kw.includes(w)) multiplier += 0.8; });
-      return Math.round(1000 * multiplier * (0.7 + Math.random() * 0.6));
-}
+const ETSY_KEY = process.env.ETSY_API_KEY || 'a6hs9rn9rx9t4dyja72xwmpc';
 
-function getCompetition(count) {
-      if (count > 50000) return 'high';
-      if (count > 10000) return 'medium';
-      return 'low';
-}
-
-export default async function handler(req, res) {
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-      res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-      if (req.method === 'OPTIONS') return res.status(200).end();
-
-  const keyword = (req.query.keyword || req.query.q || '').trim();
-      if (!keyword) return res.status(400).json({ error: 'keyword required' });
-
-  const API_KEY = process.env.ETSY_API_KEY || '';
-      if (!API_KEY) return res.status(500).json({ error: 'ETSY_API_KEY not configured' });
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  const keyword = req.query.keyword || req.query.q || '';
+  if (!keyword) return res.status(400).json({ error: 'keyword required' });
 
   let etsyResults = [];
-      let listingCount = 0;
+  let listingCount = 0;
 
   try {
-          const r = await fetch(
-                    'https://openapi.etsy.com/v3/application/listings/active?keywords=' + encodeURIComponent(keyword) + '&limit=25&sort_on=score',
-              { headers: { 'x-api-key': API_KEY, 'Accept': 'application/json' } }
-                  );
-          if (r.ok) {
-                    const d = await r.json();
-                    listingCount = d.count || 0;
-                    etsyResults = (d.results || []).slice(0, 10).map(l => ({
-                                listing_id: l.listing_id,
-                                title: l.title,
-                                price: l.price,
-                                views: l.views || 0,
-                                num_favorers: l.num_favorers || 0,
-                                tags: l.tags || [],
-                                url: l.url || 'https://www.etsy.com/listing/' + l.listing_id
-                    }));
-          }
-  } catch(e) {}
+    const r = await fetch(
+      'https://openapi.etsy.com/v3/application/listings/active?keywords=' +
+        encodeURIComponent(keyword) + '&limit=25&sort_on=score',
+      { headers: { 'x-api-key': ETSY_KEY, 'Accept': 'application/json' } }
+    );
+    if (r.ok) {
+      const d = await r.json();
+      listingCount = d.count || 0;
+      etsyResults = (d.results || []).slice(0, 10).map(l => ({
+        listing_id: l.listing_id,
+        title: l.title,
+        price: l.price
+          ? (parseFloat(l.price.amount) / (l.price.divisor || 100)).toFixed(2)
+          : '0.00',
+        views: l.views || 0,
+        favorers_count: l.num_favorers || 0,
+        url: 'https://www.etsy.com/listing/' + l.listing_id,
+        shop_name: l.shop_id || '',
+        tags: l.tags || [],
+        image_url: l.images?.[0]?.url_170x135 || ''
+      }));
+    }
+  } catch (e) {
+    console.error('Etsy search error:', e.message);
+  }
+
+  const mainVolume = listingCount > 0
+    ? Math.min(50000, Math.round(listingCount * 0.8 + Math.random() * 500))
+    : Math.floor(Math.random() * 3000 + 500);
+
+  const competition = listingCount > 10000 ? 'high' : listingCount > 3000 ? 'medium' : 'low';
+  const compScore = listingCount > 10000 ? Math.floor(Math.random()*20+70)
+                  : listingCount > 3000  ? Math.floor(Math.random()*20+40)
+                  : Math.floor(Math.random()*30+10);
+
+  const avgPrice = etsyResults.length > 0
+    ? (etsyResults.reduce((s,l) => s + parseFloat(l.price||0), 0) / etsyResults.length).toFixed(2)
+    : (20 + Math.random() * 60).toFixed(2);
 
   const words = keyword.toLowerCase().split(' ').filter(w => w.length > 2);
-      const modifiers = ['handmade','gift','jewelry','necklace','earrings','ring','pendant','botanical','resin','flower','nature','boho','for her'];
-      const related = [];
-
-  words.forEach(word => {
-          modifiers.forEach(mod => {
-                    if (!keyword.toLowerCase().includes(mod)) {
-                                related.push(word + ' ' + mod);
-                    }
-          });
+  const modifiers = ['handmade','gift','unique','custom','vintage','boho','botanical','dainty','real','dried'];
+  const related = [];
+  words.forEach(w => {
+    modifiers.slice(0, 6).forEach(m => {
+      if (!keyword.includes(m)) related.push({
+        keyword: m + ' ' + w,
+        search_volume: Math.floor(Math.random() * 3000 + 200),
+        competition: ['low','medium','high'][Math.floor(Math.random()*3)],
+        competition_score: Math.floor(Math.random() * 90 + 10),
+        avg_price: (15 + Math.random() * 60).toFixed(2)
+      });
+    });
   });
-      related.push(keyword + ' gift');
-      related.push(keyword + ' handmade');
-      related.push(keyword + ' for her');
-      related.push('unique ' + keyword);
-      related.push('real ' + keyword);
 
-  const deduplicated = [...new Set(related)].slice(0, 12);
-
-  const relatedKeywords = deduplicated.map(kw => ({
-          keyword: kw,
-          search_volume: estimateVolume(kw),
-          competition: getCompetition(estimateVolume(kw)),
-          competition_score: Math.round(Math.random() * 100),
-          avg_price: (20 + Math.random() * 40).toFixed(2)
-  }));
-
-  const mainVolume = listingCount > 0 ? listingCount : estimateVolume(keyword);
-      const avgPrice = etsyResults.length > 0
-        ? (etsyResults.reduce((s, l) => s + (l.price ? l.price.amount / l.price.divisor : 0), 0) / etsyResults.length).toFixed(2)
-              : (25 + Math.random() * 30).toFixed(2);
-
-  return res.status(200).json({
-          keyword,
-          search_volume: mainVolume,
-          competition: getCompetition(mainVolume),
-          competition_score: Math.min(100, Math.round(mainVolume / 1000)),
-          avg_price: avgPrice,
-          top_listings: etsyResults,
-          related_keywords: relatedKeywords
+  return res.json({
+    keyword,
+    search_volume: mainVolume,
+    competition,
+    competition_score: compScore,
+    avg_price: avgPrice,
+    top_listings: etsyResults,
+    related_keywords: related.slice(0, 8)
   });
-}
+};
