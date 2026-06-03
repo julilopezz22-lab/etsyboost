@@ -792,7 +792,7 @@ async function loadTrendingTags() {
   if (_trendingDataCache) { renderTrends(_trendingCurrentFilter); return; }
   grid.innerHTML = '<div class="loading"><div class="spin"></div><p>Loading trending tags from Etsy...</p></div>';
   try {
-    const kws = ['real flower jewelry','cottagecore necklace','botanical earrings','resin jewelry','handmade earrings','nature jewelry','boho jewelry','bridal jewelry','dainty necklace','orchid pendant'];
+    const kws = ['orchid pendant','preserved flower jewelry','botanical resin jewelry','real flower necklace','cottagecore necklace','botanical earrings','resin ring handmade','nature jewelry gift','pressed flower jewelry','bridal flower jewelry','dainty botanical necklace','boho resin jewelry'];
     const res = await fetch('/api/trends?keywords=' + encodeURIComponent(kws.join(',')));
     if (!res.ok) throw new Error('API error ' + res.status);
     const d = await res.json();
@@ -803,8 +803,8 @@ async function loadTrendingTags() {
              (t.keyword.includes('gift')||t.keyword.includes('bridal')) ? 'gift' :
              (t.keyword.includes('spring')||t.keyword.includes('summer')||t.keyword.includes('seasonal')) ? 'seasonal' : 'jewelry',
         vol: t.count || 0,
-        change: '+' + Math.max(1, Math.round(((t.avg_favorers||0)/50)*10)) + '%',
-        status: (t.count||0) > 50000 ? 'cool' : (t.count||0) > 20000 ? 'warm' : (t.count||0) > 8000 ? 'up' : 'hot'
+        change: t.change || ('+' + Math.max(1, Math.round(((t.avg_favorers||0)/50)*10)) + '%'),
+        status: (t.demand_score||0) > 50 ? 'hot' : (t.demand_score||0) > 20 ? 'up' : (t.count||0) > 50000 ? 'cool' : (t.count||0) > 20000 ? 'warm' : 'hot'
       }));
     } else { _trendingDataCache = getFallbackTrends(); }
   } catch(e) { _trendingDataCache = getFallbackTrends(); }
@@ -813,7 +813,7 @@ async function loadTrendingTags() {
 
 function getFallbackTrends() {
   return [
-    {tag:'real flower jewelry',cat:'botanical',vol:12400,change:'+34%',status:'hot'},
+    {tag:'orchid pendant',cat:'botanical',vol:4364,change:'+99%',status:'hot'},
     {tag:'cottagecore necklace',cat:'jewelry',vol:9800,change:'+28%',status:'hot'},
     {tag:'botanical earrings',cat:'botanical',vol:7600,change:'+22%',status:'up'},
     {tag:'resin jewelry gift',cat:'gift',vol:6200,change:'+15%',status:'up'},
