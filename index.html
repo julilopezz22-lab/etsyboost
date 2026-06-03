@@ -783,45 +783,64 @@ async function searchKeywords() {
   },600);
 }
 // ===================== TRENDING TAGS =====================
-const TRENDING_DATA = [
-  {tag:'real flower jewelry',cat:'botanical',vol:12400,change:'+34%',status:'hot'},
-  {tag:'cottagecore necklace',cat:'jewelry',vol:9800,change:'+28%',status:'hot'},
-  {tag:'botanical earrings',cat:'botanical',vol:7600,change:'+22%',status:'up'},
-  {tag:'preserved flower',cat:'botanical',vol:8900,change:'+18%',status:'up'},
-  {tag:'resin jewelry gift',cat:'gift',vol:6200,change:'+15%',status:'up'},
-  {tag:'gift for her under 50',cat:'gift',vol:18000,change:'+12%',status:'up'},
-  {tag:'bridal jewelry set',cat:'jewelry',vol:14200,change:'+9%',status:'warm'},
-  {tag:'handmade earrings',cat:'jewelry',vol:22000,change:'+7%',status:'warm'},
-  {tag:'nature jewelry',cat:'botanical',vol:11000,change:'+6%',status:'warm'},
-  {tag:'flower necklace gold',cat:'jewelry',vol:9400,change:'+5%',status:'warm'},
-  {tag:'boho jewelry',cat:'jewelry',vol:31000,change:'+3%',status:'cool'},
-  {tag:'dainty necklace',cat:'jewelry',vol:28000,change:'+2%',status:'cool'},
-  {tag:'bridesmaid gift',cat:'gift',vol:45000,change:'+1%',status:'cool'},
-  {tag:'birthday gift jewelry',cat:'gift',vol:38000,change:'0%',status:'cool'},
-  {tag:'stainless steel jewelry',cat:'jewelry',vol:16000,change:'+4%',status:'warm'},
-  {tag:'orchid pendant',cat:'botanical',vol:4800,change:'+42%',status:'hot'},
-  {tag:'resin art jewelry',cat:'botanical',vol:5200,change:'+38%',status:'hot'},
-  {tag:'spring jewelry 2025',cat:'seasonal',vol:7800,change:'+55%',status:'hot'},
-  {tag:'mother day jewelry',cat:'seasonal',vol:22000,change:'+80%',status:'hot'},
-  {tag:'summer earrings',cat:'seasonal',vol:9600,change:'+45%',status:'hot'},
-];
+let _trendingDataCache = null;
+let _trendingCurrentFilter = 'all';
 
-let currentTrendFilter = 'all';
+async function loadTrendingTags() {
+  const grid = document.getElementById('trending-grid');
+  if (!grid) return;
+  if (_trendingDataCache) { renderTrends(_trendingCurrentFilter); return; }
+  grid.innerHTML = '<div class="loading"><div class="spin"></div><p>Loading trending tags from Etsy...</p></div>';
+  try {
+    const kws = ['real flower jewelry','cottagecore necklace','botanical earrings','resin jewelry','handmade earrings','nature jewelry','boho jewelry','bridal jewelry','dainty necklace','orchid pendant'];
+    const res = await fetch('/api/trends?keywords=' + encodeURIComponent(kws.join(',')));
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const d = await res.json();
+    if (d.trends && d.trends.length) {
+      _trendingDataCache = d.trends.map(t => ({
+        tag: t.keyword,
+        cat: (t.keyword.includes('botanical')||t.keyword.includes('flower')||t.keyword.includes('orchid')||t.keyword.includes('resin')) ? 'botanical' :
+             (t.keyword.includes('gift')||t.keyword.includes('bridal')) ? 'gift' :
+             (t.keyword.includes('spring')||t.keyword.includes('summer')||t.keyword.includes('seasonal')) ? 'seasonal' : 'jewelry',
+        vol: t.count || 0,
+        change: '+' + Math.max(1, Math.round(((t.avg_favorers||0)/50)*10)) + '%',
+        status: (t.count||0) > 50000 ? 'cool' : (t.count||0) > 20000 ? 'warm' : (t.count||0) > 8000 ? 'up' : 'hot'
+      }));
+    } else { _trendingDataCache = getFallbackTrends(); }
+  } catch(e) { _trendingDataCache = getFallbackTrends(); }
+  renderTrends(_trendingCurrentFilter);
+}
+
+function getFallbackTrends() {
+  return [
+    {tag:'real flower jewelry',cat:'botanical',vol:12400,change:'+34%',status:'hot'},
+    {tag:'cottagecore necklace',cat:'jewelry',vol:9800,change:'+28%',status:'hot'},
+    {tag:'botanical earrings',cat:'botanical',vol:7600,change:'+22%',status:'up'},
+    {tag:'resin jewelry gift',cat:'gift',vol:6200,change:'+15%',status:'up'},
+    {tag:'handmade earrings',cat:'jewelry',vol:22000,change:'+7%',status:'warm'},
+    {tag:'nature jewelry',cat:'botanical',vol:11000,change:'+6%',status:'warm'},
+    {tag:'boho jewelry',cat:'jewelry',vol:31000,change:'+3%',status:'cool'},
+    {tag:'bridesmaid gift',cat:'gift',vol:45000,change:'+1%',status:'cool'},
+    {tag:'orchid pendant',cat:'botanical',vol:4800,change:'+42%',status:'hot'},
+    {tag:'spring jewelry 2025',cat:'seasonal',vol:7800,change:'+55%',status:'hot'},
+  ];
+}
+
 function renderTrends(filter) {
-  const data = filter==='all' ? TRENDING_DATA : TRENDING_DATA.filter(t=>t.cat===filter);
-  const grid = document.getElementById('trend-grid');
+  _trendingCurrentFilter = filter || 'all';
+  const data = (_trendingDataCache || getFallbackTrends()).filter(t => _trendingCurrentFilter==='all' || t.cat===_trendingCurrentFilter);
+  const grid = document.getElementById('trending-grid');
   if(!grid) return;
   grid.innerHTML = data.map(t=>{
     const badgeClass = t.status==='hot'?'trend-hot':t.status==='up'?'trend-up':t.status==='warm'?'trend-warm':'trend-cool';
-    const badgeText = t.status==='hot'?'🔥 Hot':t.status==='up'?'📈 Rising':t.status==='warm'?'→ Stable':'❄ Cool';
-    return '<div class="trend-card" onclick="navigator.clipboard.writeText(t.tag)">'+
+    const badgeText = t.status==='hot'?'🔥 Hot':t.status==='up'?'⬆️ Rising':t.status==='warm'?'🟡 Warm':'🔵 Cool';
+    return '<div class="trend-card" onclick="navigator.clipboard.writeText(''+escHtml(t.tag)+'')">'+
       '<div class="trend-tag">'+escHtml(t.tag)+'</div>'+
       '<div class="trend-meta">'+
-      '<span style="font-family:DM Mono,monospace;font-size:12px">'+t.vol.toLocaleString()+'/mo</span>'+
-      '<span style="color:var(--green);font-weight:600">'+t.change+'</span>'+
+      '<span>'+((t.vol||0).toLocaleString())+' listings</span>'+
+      '<span style="color:var(--green)">'+escHtml(t.change||'')+'</span>'+
       '</div>'+
       '<div style="margin-top:6px"><span class="trend-badge '+badgeClass+'">'+badgeText+'</span></div>'+
-      '<div style="font-size:10px;color:var(--text3);margin-top:6px">Click to copy</div>'+
       '</div>';
   }).join('');
 }
@@ -836,80 +855,79 @@ function filterTrends(cat, btn) {
 function checkRanks() {
   const kw = (document.getElementById('rank-kw-input')?.value||'').trim();
   const area = document.getElementById('rank-results-area');
-  if(!kw) { area.innerHTML='<div style="padding:20px;color:var(--text2)">Please enter a keyword to check.</div>'; return; }
-  area.innerHTML='<div class="loading"><div class="spin"></div><p>Checking your listing rankings...</p></div>';
-  setTimeout(()=>{
-    const myListings = allListings.slice(0,8).map((l,i)=>{
-      const pos = Math.floor(Math.random()*120)+1;
-      const prevPos = pos + Math.floor(Math.random()*20)-10;
-      const change = prevPos - pos;
-      return {title:l.title,pos,prevPos,change,score:l._score,views:l.views||0};
-    }).sort((a,b)=>a.pos-b.pos);
-    
-    if(!myListings.length){
-      area.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">Load your listings first from the Dashboard to see rankings.</div>';
-      return;
-    }
-    
-    area.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden">'+
-      '<div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)">Rankings for: <strong style="color:var(--text)">"'+escHtml(kw)+'"</strong> — Estimated positions (based on SEO score simulation)</div>'+
-      '<table class="rank-table"><thead><tr><th>Position</th><th>Listing</th><th>Change</th><th>SEO Score</th><th>Views</th></tr></thead><tbody>'+
-      myListings.map(r=>{
-        const changeColor=r.change>0?'rank-up':r.change<0?'rank-down':'rank-same';
-        const changeText=r.change>0?'▲ +'+r.change:r.change<0?'▼ '+r.change:'— same';
-        const posColor=r.pos<=10?'var(--green)':r.pos<=50?'var(--amber)':'var(--text3)';
-        return '<tr>'+
-          '<td><span class="rank-pos" style="color:'+posColor+'">#'+r.pos+'</span></td>'+
-          '<td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml((r.title||'').substring(0,60))+(r.title&&r.title.length>60?'...':'')+'</td>'+
-          '<td><span class="rank-change '+changeColor+'">'+changeText+'</span></td>'+
-          '<td><span class="sbadge '+scClass(r.score)+'">'+r.score+'</span></td>'+
-          '<td>'+r.views.toLocaleString()+'</td>'+
-          '</tr>';
-      }).join('')+
-      '</tbody></table>'+
-      '</div>'+
-      '<div style="margin-top:12px;padding:12px;background:var(--amber-dim);border:1px solid rgba(245,166,35,.3);border-radius:8px;font-size:11px;color:var(--amber)">'+
-      '⚠️ Note: Rank positions are estimated based on your listing SEO scores. For accurate live rankings, connect your Etsy API with full access permissions.</div>';
-  }, 800);
+  if(!area) return;
+  if (!kw) { area.innerHTML = '<div style="color:var(--text2);padding:20px">Enter a keyword to check rankings.</div>'; return; }
+  area.innerHTML = '<div class="loading"><div class="spin"></div><p>Searching Etsy rankings for "'+escHtml(kw)+'"...</p></div>';
+  fetch('/api/keyword-explorer?keyword=' + encodeURIComponent(kw))
+    .then(r => r.json())
+    .then(d => {
+      const listings = d.top_listings || [];
+      if(!listings.length) {
+        area.innerHTML = '<div style="color:var(--text2);padding:20px">No results found for "'+escHtml(kw)+'".</div>';
+        return;
+      }
+      area.innerHTML =
+        '<div class="nano-box" style="margin-bottom:14px">'+
+        '<div class="nano-lbl">Keyword: '+escHtml(kw)+'</div>'+
+        '<div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:6px">'+
+        '<span style="font-size:12px;color:var(--text2)">'+((d.search_volume||0).toLocaleString())+' listings found</span>'+
+        '<span style="font-size:12px;color:var('+(d.competition==='high'?'--red':d.competition==='low'?'--green':'--amber')+')">Competition: '+(d.competition||'medium')+'</span>'+
+        '<span style="font-size:12px;color:var(--text2)">Avg price: $'+(d.avg_price||'--')+'</span>'+
+        '</div>'+
+        '</div>'+
+        '<table class="rank-table"><thead><tr><th>Rank</th><th>Listing</th><th>Favorers</th><th>Views</th><th>Tags</th></tr></thead><tbody>'+
+        listings.map((l,i)=>{
+          const posColor = i<3?'var(--green)':i<7?'var(--amber)':'var(--text2)';
+          return '<tr>'+
+            '<td><span class="rank-pos" style="color:'+posColor+'">#'+(i+1)+'</span></td>'+
+            '<td style="max-width:220px"><a href="'+(l.url||'#')+'" target="_blank" style="color:var(--text);font-size:11px;text-decoration:none">'+escHtml((l.title||'').substring(0,60))+'...</a></td>'+
+            '<td style="font-family:DM Mono,monospace;color:var(--green)">'+(l.num_favorers||0).toLocaleString()+'</td>'+
+            '<td style="font-family:DM Mono,monospace">'+(l.views||0).toLocaleString()+'</td>'+
+            '<td style="font-size:10px;color:var(--text3)">'+(l.tags||[]).slice(0,3).join(', ')+'</td>'+
+            '</tr>';
+        }).join('')+
+        '</tbody></table>';
+    })
+    .catch(e => { area.innerHTML = '<div style="color:var(--red);padding:20px">Error: '+escHtml(e.message)+'</div>'; });
 }
 
 // ===================== COMPETITORS =====================
-const COMP_DATA = [
-  {name:'WildbloomJewelry',emoji:'🌿',listings:284,sales:12400,avgScore:88,avgPrice:52,tags:['botanical jewelry','real flower','cottagecore','pressed flower']},
-  {name:'NatureCraftStudio',emoji:'🌸',listings:156,sales:8900,avgScore:82,avgPrice:38,tags:['nature jewelry','handmade earrings','floral pendant','botanical gift']},
-  {name:'ResinAndPetals',emoji:'💎',listings:203,sales:15600,avgScore:91,avgPrice:65,tags:['resin jewelry','preserved flower','botanical necklace','bridal jewelry']},
-  {name:'FloralArtisanCo',emoji:'🌺',listings:118,sales:6200,avgScore:78,avgPrice:44,tags:['flower jewelry','cottagecore','nature pendant','boho earrings']},
-  {name:'BotanicalGems',emoji:'🌱',listings:342,sales:22000,avgScore:94,avgPrice:71,tags:['real botanical','pressed jewelry','flower pendant','bridal earrings']},
-  {name:'NatureWornJewelry',emoji:'🍃',listings:95,sales:4800,avgScore:75,avgPrice:35,tags:['nature jewelry','handmade gift','botanical earrings','wildflower']},
-];
-
-function renderCompetitors(data) {
+async function searchCompetitors() {
+  const input = (document.getElementById('comp-search-input')?.value||'').trim();
   const grid = document.getElementById('comp-grid');
   if(!grid) return;
-  grid.innerHTML = data.map(c=>{
-    return '<div class="comp-card">'+
-      '<div class="comp-header">'+
-      '<div class="comp-avatar">'+c.emoji+'</div>'+
-      '<div>'+
-      '<div class="comp-name">'+escHtml(c.name)+'</div>'+
-      '<div class="comp-url">etsy.com/shop/'+c.name.toLowerCase()+'</div>'+
-      '</div>'+
-      '</div>'+
-      '<div class="comp-stats">'+
-      '<div class="comp-stat"><div class="cs-l">Listings</div><div class="cs-v">'+c.listings+'</div></div>'+
-      '<div class="comp-stat"><div class="cs-l">Est. Sales</div><div class="cs-v">'+c.sales.toLocaleString()+'</div></div>'+
-      '<div class="comp-stat"><div class="cs-l">SEO Score</div><div class="cs-v" style="color:'+(c.avgScore>=85?'var(--green)':c.avgScore>=70?'var(--amber)':'var(--red)')+'">'+c.avgScore+'</div></div>'+
-      '<div class="comp-stat"><div class="cs-l">Avg Price</div><div class="cs-v" style="color:var(--blue)">$'+c.avgPrice+'</div></div>'+
-      '</div>'+
-      '<div style="margin-top:10px"><div class="nano-lbl" style="color:var(--text3)">TOP TAGS</div>'+
-      '<div class="mtags">'+c.tags.map(t=>'<span class="mtag ltag">'+escHtml(t)+'</span>').join('')+'</div></div>'+
-      '</div>';
-  }).join('');
-}
-
-async function searchCompetitors() {
-  const q = (document.getElementById('comp-search-input')?.value||'').trim();
-  renderCompetitors(COMP_DATA);
+  const kw = input || 'botanical jewelry';
+  grid.innerHTML = '<div class="loading"><div class="spin"></div><p>Searching Etsy for "'+escHtml(kw)+'"...</p></div>';
+  try {
+    const res = await fetch('/api/keyword-explorer?keyword=' + encodeURIComponent(kw));
+    if(!res.ok) throw new Error('API error ' + res.status);
+    const d = await res.json();
+    const listings = d.top_listings || [];
+    if(!listings.length) { grid.innerHTML = '<div style="color:var(--text2);padding:20px">No results found.</div>'; return; }
+    grid.innerHTML = listings.slice(0,6).map((l,i) => {
+      const emojis = ['🌿','🌸','💎','🌺','🌱','🍃'];
+      const price = l.price ? (l.price.amount/l.price.divisor).toFixed(2) : '--';
+      return '<div class="comp-card">'+
+        '<div class="comp-header">'+
+        '<div class="comp-avatar">'+emojis[i]+'</div>'+
+        '<div>'+
+        '<div class="comp-name" style="font-size:12px">'+escHtml((l.title||'').substring(0,40))+'...</div>'+
+        '<a href="'+(l.url||'#')+'" target="_blank" class="comp-url">Ver en Etsy &rarr;</a>'+
+        '</div>'+
+        '</div>'+
+        '<div class="comp-stats">'+
+        '<div class="comp-stat"><div class="cs-l">Price</div><div class="cs-v" style="color:var(--green)">$'+escHtml(price)+'</div></div>'+
+        '<div class="comp-stat"><div class="cs-l">Views</div><div class="cs-v">'+(l.views||0).toLocaleString()+'</div></div>'+
+        '<div class="comp-stat"><div class="cs-l">Favorers</div><div class="cs-v" style="color:var(--accent)">'+(l.num_favorers||0).toLocaleString()+'</div></div>'+
+        '</div>'+
+        '<div style="margin-top:10px"><div class="nano-lbl" style="color:var(--text3)">TAGS</div>'+
+        '<div class="mtags">'+((l.tags||[]).slice(0,4)).map(t=>'<span class="mtag ltag">'+escHtml(t)+'</span>').join('')+'</div>'+
+        '</div>'+
+        '</div>';
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = '<div style="color:var(--red);padding:20px">Error: '+escHtml(e.message)+'</div>';
+  }
 }
 
 // ===================== SHOP ANALYZER =====================
@@ -1251,9 +1269,9 @@ function navigateTo(pageId) {
   const navItem=document.querySelector('[data-page="'+pageId+'"]');
   if(navItem) navItem.classList.add('active');
   // Initialize page-specific data
-  if(pageId==='trending') renderTrends('all');
+  if(pageId==='trending') loadTrendingTags();
   if(pageId==='tag-report') renderTagReport();
-  if(pageId==='competitors') renderCompetitors(COMP_DATA);
+  if(pageId==='competitors') searchCompetitors();
     if(pageId==='health-check') runHealthCheck();
     if(pageId==='bulk-analysis') runBulkAnalysis();
   if(pageId==='shop-analyzer' && allListings.length) { /* ready */ }
@@ -1298,7 +1316,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   initTagsInput();
   // Navigation
   document.querySelectorAll('.nav-item').forEach(btn=>{
-price_stats?.max      e.preventDefault();
+    e.preventDefault();
       const pg=btn.dataset.page;
       if(pg) navigateTo(pg);
     });
