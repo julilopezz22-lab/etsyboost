@@ -1320,7 +1320,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       const pg=btn.dataset.page;
       if(pg) navigateTo(pg);
     });
-  });
   // Modal
   document.getElementById('mclose').onclick=()=>document.getElementById('modal').classList.remove('open');
   document.getElementById('modal').onclick=(e)=>{if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');};
