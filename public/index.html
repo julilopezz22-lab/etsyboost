@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EtsyBoost â SEO Dashboard</title>
+<title>EtsyBoost &#x2014; SEO Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0a0a;--bg2:#111;--bg3:#181818;--bg4:#1f1f1f;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--text:#f0f0f0;--text2:#777;--text3:#3a3a3a;--green:#1dbd6e;--green-dim:rgba(29,189,110,0.1);--amber:#f5a623;--amber-dim:rgba(245,166,35,0.1);--red:#ff4f4f;--red-dim:rgba(255,79,79,0.1);--accent:#1dbd6e;--blue:#4a9eff;--blue-dim:rgba(74,158,255,0.1);--purple:#9b59b6;--purple-dim:rgba(155,89,182,0.1);}
@@ -195,7 +195,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <body>
 <nav class="sidebar">
   <div class="logo">
-    <div class="logo-ico">ð¸</div>
+    <div class="logo-ico">&#x1F338;</div>
     <div class="logo-txt">Etsy<span>Boost</span></div>
   </div>
   <div class="nav-section">Dashboard</div>
@@ -255,7 +255,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
       <div class="stats-row" id="stats-row"></div>
       <div class="filters" id="filters">
-        <div class="search-box"><span>ð</span><input type="text" id="search-input" placeholder="Search listings..."></div>
+        <div class="search-box"><span>&#x1F50D;</span><input type="text" id="search-input" placeholder="Search listings..."></div>
         <select class="sort-sel" id="sort-sel">
           <option value="score-low">Score: Low first</option>
           <option value="score-high">Score: High first</option>
@@ -264,20 +264,20 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           <option value="price-low">Price: Low</option>
         </select>
         <button class="fchip active" data-f="all">All</button>
-        <button class="fchip" data-f="needs-work">ð´ Needs Work</button>
-        <button class="fchip" data-f="good">ð¡ Good</button>
-        <button class="fchip" data-f="great">ð¢ Great</button>
-        <button class="fchip" data-f="no-tags">â  Tags Missing</button>
+        <button class="fchip" data-f="needs-work">&#x1F534; Needs Work</button>
+        <button class="fchip" data-f="good">&#x1F7E1; Good</button>
+        <button class="fchip" data-f="great">&#x1F7E2; Great</button>
+        <button class="fchip" data-f="no-tags">&#x26A0; Tags Missing</button>
       </div>
       <div class="listings-grid" id="listings-grid"></div>
       <div class="pagination" id="pagination" style="display:none">
-        <button class="page-btn" id="prev-btn" disabled>â Prev</button>
+        <button class="page-btn" id="prev-btn" disabled>&#x2190; Prev</button>
         <span class="page-info" id="page-info"></span>
-        <button class="page-btn" id="next-btn">Next â</button>
+        <button class="page-btn" id="next-btn">Next &#x2192;</button>
       </div>
     </div>
     <div id="error-section" style="display:none;padding:40px;text-align:center;">
-      <div style="font-size:32px;margin-bottom:12px">â ï¸</div>
+      <div style="font-size:32px;margin-bottom:12px">&#x26A0;&#xFE0F;</div>
       <div style="font-size:16px;font-weight:600;margin-bottom:8px" id="err-title">Connection Error</div>
       <div style="font-size:13px;color:var(--text2)" id="err-msg"></div>
     </div>
@@ -316,7 +316,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           </select>
         </div>
       </div>
-      <button class="kw-btn" style="margin-top:14px;width:100%" onclick="runGrader()">ð¯ Grade This Listing</button>
+      <button class="kw-btn" style="margin-top:14px;width:100%" onclick="runGrader()">&#x1F3AF; Grade This Listing</button>
     </div>
     <div class="grade-result" id="grade-result" style="display:none"></div>
   </div>
@@ -329,7 +329,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </div>
     <div class="kw-search-wrap">
       <input class="kw-input" id="kw-search-input" placeholder="Enter a keyword (e.g. flower jewelry, botanical ring, resin necklace)..." onkeydown="if(event.key==='Enter')searchKeywords()">
-      <button class="kw-btn" onclick="searchKeywords()">ð Explore</button>
+      <button class="kw-btn" onclick="searchKeywords()">&#x1F50D; Explore</button>
     </div>
     <div id="kw-results-area">
       <div style="padding:40px;text-align:center;color:var(--text2);font-size:13px">
@@ -337,8 +337,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
     </div>
   </div>
-<button class="fchip" onclick="filterTrends('seasonal',this)">ð¸ Seasonal</button>
-  <button class="fchip" onclick="filterTrends('yours',this)">â­ Your Tags</button>
+<button class="fchip" onclick="filterTrends('seasonal',this)">&#x1F338; Seasonal</button>
+  <button class="fchip" onclick="filterTrends('yours',this)">&#x2B50; Your Tags</button>
 </div><!-- TRENDING TAGS PAGE -->
   <div class="page" id="page-trending">
     <div class="page-header">
@@ -347,10 +347,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </div>
     <div class="filters" style="margin-bottom:16px">
       <button class="fchip active" onclick="filterTrends('all',this)">All</button>
-      <button class="fchip" onclick="filterTrends('jewelry',this)">ð Jewelry</button>
-      <button class="fchip" onclick="filterTrends('botanical',this)">ð¿ Botanical</button>
-      <button class="fchip" onclick="filterTrends('gift',this)">ð Gifts</button>
-      <button class="fchip" onclick="filterTrends('seasonal',this)">ð¸ Seasonal</button>
+      <button class="fchip" onclick="filterTrends('jewelry',this)">&#x1F48E; Jewelry</button>
+      <button class="fchip" onclick="filterTrends('botanical',this)">&#x1F33F; Botanical</button>
+      <button class="fchip" onclick="filterTrends('gift',this)">&#x1F381; Gifts</button>
+      <button class="fchip" onclick="filterTrends('seasonal',this)">&#x1F338; Seasonal</button>
     </div>
     <div class="trend-grid" id="trend-grid"></div>
   </div>
@@ -367,7 +367,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           <div class="mlbl">KEYWORD TO CHECK</div>
           <input type="text" id="rank-kw-input" class="kw-input" placeholder="e.g. real flower necklace..." onkeydown="if(event.key==='Enter')checkRanks()">
         </div>
-        <button class="kw-btn" onclick="checkRanks()">ð Check Ranks</button>
+        <button class="kw-btn" onclick="checkRanks()">&#x1F4C8; Check Ranks</button>
       </div>
     </div>
     <div id="rank-results-area">
@@ -389,7 +389,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           <div class="mlbl">SEARCH FOR COMPETITORS</div>
           <input type="text" id="comp-search-input" class="kw-input" placeholder="Enter a shop name or keyword niche (e.g. botanical jewelry)..." onkeydown="if(event.key==='Enter')searchCompetitors()">
         </div>
-        <button class="kw-btn" onclick="searchCompetitors()">ð¥ Analyze</button>
+        <button class="kw-btn" onclick="searchCompetitors()">&#x1F94A; Analyze</button>
       </div>
     </div>
     <div class="comp-grid" id="comp-grid"></div>
@@ -407,7 +407,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           <div class="mlbl">SHOP NAME</div>
           <input type="text" id="shop-input" class="kw-input" placeholder="Enter Etsy shop name (e.g. julietshopp)..." value="julietshopp" onkeydown="if(event.key==='Enter')analyzeShop()">
         </div>
-        <button class="kw-btn" onclick="analyzeShop()">ðª Analyze Shop</button>
+        <button class="kw-btn" onclick="analyzeShop()">&#x1F3EA; Analyze Shop</button>
       </div>
     </div>
     <div id="shop-result-area">
@@ -433,11 +433,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <div class="page" id="page-health-check">
   <div class="page-header">
     <div class="page-title">Health Check</div>
-    <div class="page-sub">Detecta listings con tÃ­tulos cortos, pocos tags o descripciones incompletas</div>
+    <div class="page-sub">Detecta listings con t&#xED;tulos cortos, pocos tags o descripciones incompletas</div>
   </div>
   <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center">
     <input class="kw-input" id="hc-shop-input" value="julietshopp" placeholder="Nombre de la shop...">
-    <button class="kw-btn" onclick="runHealthCheck()">ð¥ Revisar</button>
+    <button class="kw-btn" onclick="runHealthCheck()">&#x1F3E5; Revisar</button>
   </div>
   <div id="hc-result-area"><div style="padding:40px;text-align:center;color:var(--text2)">Haz clic en Revisar para analizar tu shop</div></div>
 </div>
@@ -446,24 +446,24 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <div class="page" id="page-bulk-analysis">
   <div class="page-header">
     <div class="page-title">Bulk Analysis</div>
-    <div class="page-sub">EstadÃ­sticas completas de todos tus listings: precios, tags, vistas</div>
+    <div class="page-sub">Estad&#xED;sticas completas de todos tus listings: precios, tags, vistas</div>
   </div>
   <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center">
     <input class="kw-input" id="ba-shop-input" value="julietshopp" placeholder="Nombre de la shop...">
-    <button class="kw-btn" onclick="runBulkAnalysis()">ð¦ Analizar todo</button>
+    <button class="kw-btn" onclick="runBulkAnalysis()">&#x1F4E6; Analizar todo</button>
   </div>
-  <div id="ba-result-area"><div style="padding:40px;text-align:center;color:var(--text2)">Haz clic en Analizar para ver las estadÃ­sticas</div></div>
+  <div id="ba-result-area"><div style="padding:40px;text-align:center;color:var(--text2)">Haz clic en Analizar para ver las estad&#xED;sticas</div></div>
 </div>
 
 <!-- TOP SELLERS PAGE -->
 <div class="page" id="page-top-sellers">
   <div class="page-header">
     <div class="page-title">Top Sellers</div>
-    <div class="page-sub">Busca los listings mÃ¡s exitosos de Etsy por keyword</div>
+    <div class="page-sub">Busca los listings m&#xE1;s exitosos de Etsy por keyword</div>
   </div>
   <div style="display:flex;gap:10px;margin-bottom:20px">
     <input class="kw-input" id="ts-input" placeholder="ej: digital planner, wall art..." onkeydown="if(event.key==='Enter')runTopSellers()">
-    <button class="kw-btn" onclick="runTopSellers()">ð Buscar</button>
+    <button class="kw-btn" onclick="runTopSellers()">&#x1F3C6; Buscar</button>
   </div>
   <div id="ts-result-area"><div style="padding:40px;text-align:center;color:var(--text2)">Ingresa un keyword para ver los top sellers</div></div>
 </div>
@@ -477,7 +477,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div style="margin-bottom:8px;font-size:11px;color:var(--text2)">Separa los keywords con comas</div>
   <div style="display:flex;gap:10px;margin-bottom:20px">
     <input class="kw-input" id="tr-input" placeholder="ej: digital planner, wall art, sticker sheet" onkeydown="if(event.key==='Enter')runTrends()">
-    <button class="kw-btn" onclick="runTrends()">ð Comparar</button>
+    <button class="kw-btn" onclick="runTrends()">&#x1F4CA; Comparar</button>
   </div>
   <div id="tr-result-area"><div style="padding:40px;text-align:center;color:var(--text2)">Ingresa keywords para comparar tendencias</div></div>
 </div><!-- LISTING ANALYSIS MODAL -->
@@ -485,7 +485,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="modal">
     <div class="modal-hdr">
       <div class="modal-title">Listing Analysis</div>
-      <button class="mclose" id="mclose">â</button>
+      <button class="mclose" id="mclose">&#x2715;</button>
     </div>
     <div class="mbody" id="mbody"></div>
   </div>
@@ -502,45 +502,45 @@ let currentGraderTags = [];
 // ===================== ANALYSIS FUNCTIONS =====================
 function analyzeTitle(t) {
   const issues=[]; let score=100;
-  if(!t) return {issues:[{type:'error',icon:'â',msg:'No title provided.'}],score:0};
+  if(!t) return {issues:[{type:'error',icon:'&#x274C;',msg:'No title provided.'}],score:0};
   const len=t.length;
-  if(len<80){issues.push({type:'error',icon:'ð',msg:'Too short: '+len+'/140 chars. Missing '+(140-len)+' free SEO characters.'});score-=35;}
-  else if(len<100){issues.push({type:'warning',icon:'ð',msg:'Could be longer: '+len+'/140 chars. Aim for 130+'});score-=15;}
-  else if(len>=130){issues.push({type:'success',icon:'â',msg:'Great length: '+len+'/140 chars!'});}
+  if(len<80){issues.push({type:'error',icon:'&#x1F4CF;',msg:'Too short: '+len+'/140 chars. Missing '+(140-len)+' free SEO characters.'});score-=35;}
+  else if(len<100){issues.push({type:'warning',icon:'&#x1F4CF;',msg:'Could be longer: '+len+'/140 chars. Aim for 130+'});score-=15;}
+  else if(len>=130){issues.push({type:'success',icon:'&#x2705;',msg:'Great length: '+len+'/140 chars!'});}
   const words=t.toLowerCase().replace(/[,\-\u2013:]/g,' ').split(/\s+/).filter(w=>w.length>3);
   const wc={};words.forEach(w=>{wc[w]=(wc[w]||0)+1;});
   const dups=Object.entries(wc).filter(([,c])=>c>1).map(([w])=>w);
-  if(dups.length){issues.push({type:'error',icon:'ð',msg:'Repeated words: "'+dups.join('", "')+'". Etsy ignores duplicates.'});score-=20*Math.min(dups.length,3);}
+  if(dups.length){issues.push({type:'error',icon:'&#x1F501;',msg:'Repeated words: "'+dups.join('", "')+'". Etsy ignores duplicates.'});score-=20*Math.min(dups.length,3);}
   const hasPrice=t.match(/\$[0-9]/);
-  if(hasPrice){issues.push({type:'error',icon:'ð°',msg:'Do not include prices in title - Etsy may penalize this.'});score-=15;}
+  if(hasPrice){issues.push({type:'error',icon:'&#x1F4B0;',msg:'Do not include prices in title - Etsy may penalize this.'});score-=15;}
   const kwWords=words.filter(w=>w.length>4);
-  if(kwWords.length<5){issues.push({type:'warning',icon:'ð',msg:'Add more descriptive keywords to improve discoverability.'});score-=10;}
-  if(!issues.some(i=>i.type==='success')&&!issues.length) issues.push({type:'success',icon:'â',msg:'Title looks great!'});
-  if(!issues.length) issues.push({type:'success',icon:'â',msg:'Title looks great!'});
+  if(kwWords.length<5){issues.push({type:'warning',icon:'&#x1F511;',msg:'Add more descriptive keywords to improve discoverability.'});score-=10;}
+  if(!issues.some(i=>i.type==='success')&&!issues.length) issues.push({type:'success',icon:'&#x2705;',msg:'Title looks great!'});
+  if(!issues.length) issues.push({type:'success',icon:'&#x2705;',msg:'Title looks great!'});
   return {issues,score:Math.max(0,score)};
 }
 
 function analyzeTags(tags,title) {
   const issues=[]; let score=100;
   const badSet=new Set(); const warnSet=new Set();
-  if(!tags||!tags.length) return {issues:[{type:'warning',icon:'ð·ï¸',msg:'No tags found.'}],score:50,badSet,warnSet};
-  if(tags.length<13){issues.push({type:'error',icon:'ð·ï¸',msg:'Only '+tags.length+'/13 tags. Add '+(13-tags.length)+' more â you are leaving free SEO on the table!'});score-=(13-tags.length)*6;}
-  else{issues.push({type:'success',icon:'â',msg:'All 13 tags used!'});}
+  if(!tags||!tags.length) return {issues:[{type:'warning',icon:'&#x1F3F7;&#xFE0F;',msg:'No tags found.'}],score:50,badSet,warnSet};
+  if(tags.length<13){issues.push({type:'error',icon:'&#x1F3F7;&#xFE0F;',msg:'Only '+tags.length+'/13 tags. Add '+(13-tags.length)+' more &#x2014; you are leaving free SEO on the table!'});score-=(13-tags.length)*6;}
+  else{issues.push({type:'success',icon:'&#x2705;',msg:'All 13 tags used!'});}
   const tw=new Set((title||'').toLowerCase().replace(/[,\-\u2013:]/g,' ').split(/\s+/).filter(w=>w.length>4));
   const allTagWords=[];
   const tagWordSets=tags.map(tag=>new Set(tag.toLowerCase().split(/\s+/).filter(w=>w.length>2)));
   tags.forEach((tag,i)=>{
-    if(tag.length>20){issues.push({type:'error',icon:'â ï¸',msg:'"'+tag+'" is '+tag.length+' chars â max is 20.'});score-=10;badSet.add(tag);}
+    if(tag.length>20){issues.push({type:'error',icon:'&#x26A0;&#xFE0F;',msg:'"'+tag+'" is '+tag.length+' chars &#x2014; max is 20.'});score-=10;badSet.add(tag);}
     const tagW=tag.toLowerCase().split(/\s+/).filter(w=>w.length>4);
-    if(tagW.length&&tagW.every(w=>tw.has(w))){issues.push({type:'warning',icon:'ð',msg:'"'+tag+'" repeats title keywords â use unique terms.'});score-=8;warnSet.add(tag);}
+    if(tagW.length&&tagW.every(w=>tw.has(w))){issues.push({type:'warning',icon:'&#x1F501;',msg:'"'+tag+'" repeats title keywords &#x2014; use unique terms.'});score-=8;warnSet.add(tag);}
     for(let j=i+1;j<tags.length;j++){
-      if(tags[i].toLowerCase()===tags[j].toLowerCase()){issues.push({type:'error',icon:'ð',msg:'Duplicate tag: "'+tag+'"'});score-=12;badSet.add(tag);}
+      if(tags[i].toLowerCase()===tags[j].toLowerCase()){issues.push({type:'error',icon:'&#x1F501;',msg:'Duplicate tag: "'+tag+'"'});score-=12;badSet.add(tag);}
     }
     allTagWords.push(...tagW);
   });
   const singleWordTags=tags.filter(t=>!t.includes(' '));
-  if(singleWordTags.length>3){issues.push({type:'warning',icon:'ð¡',msg:singleWordTags.length+' single-word tags. Multi-word phrases get more specific traffic.'});score-=5;}
-  if(!issues.some(i=>i.type==='error')&&!issues.some(i=>i.type==='warning')) issues.push({type:'success',icon:'â',msg:'All tags look valid!'});
+  if(singleWordTags.length>3){issues.push({type:'warning',icon:'&#x1F4A1;',msg:singleWordTags.length+' single-word tags. Multi-word phrases get more specific traffic.'});score-=5;}
+  if(!issues.some(i=>i.type==='error')&&!issues.some(i=>i.type==='warning')) issues.push({type:'success',icon:'&#x2705;',msg:'All tags look valid!'});
   return {issues,score:Math.max(0,score),badSet,warnSet};
 }
 
@@ -640,7 +640,7 @@ function renderGrid(listings) {
     const badSet=gR.badSet||new Set();
     const warnSet=gR.warnSet||new Set();
     const missingTags=13-(l.tags||[]).length;
-    return '<div class="lcard" data-id="'+l.listing_id+'"><div class="limg">'+(imgUrl?'<img src="'+imgUrl+'" alt="" loading="lazy">':'ð¸')+'</div><div class="lbody"><div class="ltitle">'+escHtml(l.title||'No title')+'</div><div class="lmeta"><span class="lprice">$'+l._price+'</span><span class="lviews">'+((l.views||0))+' views</span></div><div class="ltags">'+tags.map(t=>'<span class="ltag '+(badSet.has(t)?'bad':warnSet.has(t)?'warn':'')+'">'+(t)+'</span>').join('')+(l.tags&&l.tags.length>3?'<span class="ltag">+'+(l.tags.length-3)+'</span>':'')+(missingTags>0?'<span class="ltag bad">'+missingTags+' missing</span>':'')+'</div><div class="lscore-row"><span class="sbadge '+scClass(l._score)+'">'+l._score+'/100</span><button class="opt-btn" data-id="'+l.listing_id+'">Analyze â</button></div></div></div>';
+    return '<div class="lcard" data-id="'+l.listing_id+'"><div class="limg">'+(imgUrl?'<img src="'+imgUrl+'" alt="" loading="lazy">':'&#x1F338;')+'</div><div class="lbody"><div class="ltitle">'+escHtml(l.title||'No title')+'</div><div class="lmeta"><span class="lprice">$'+l._price+'</span><span class="lviews">'+((l.views||0))+' views</span></div><div class="ltags">'+tags.map(t=>'<span class="ltag '+(badSet.has(t)?'bad':warnSet.has(t)?'warn':'')+'">'+(t)+'</span>').join('')+(l.tags&&l.tags.length>3?'<span class="ltag">+'+(l.tags.length-3)+'</span>':'')+(missingTags>0?'<span class="ltag bad">'+missingTags+' missing</span>':'')+'</div><div class="lscore-row"><span class="sbadge '+scClass(l._score)+'">'+l._score+'/100</span><button class="opt-btn" data-id="'+l.listing_id+'">Analyze &#x2197;</button></div></div></div>';
   }).join('');
   grid.querySelectorAll('[data-id]').forEach(el=>{
     el.addEventListener('click',()=>{
@@ -708,14 +708,14 @@ function openModal(l) {
     '<div class="label-row" style="margin-top:6px"><span>Price</span><span class="sbadge '+scClass(pR.score)+'">'+pR.score+'</span></div>'+
     '<div class="seo-meter"><div class="seo-fill '+(pR.score>=75?'seo-green':pR.score>=50?'seo-amber':'seo-red')+'" style="width:'+pR.score+'%"></div></div>'+
     '</div></div></div>'+
-    '<div class="msec"><div class="mlbl">TITLE ('+titleLen+'/140 chars â '+titlePct+'% used)</div>'+
+    '<div class="msec"><div class="mlbl">TITLE ('+titleLen+'/140 chars &#x2014; '+titlePct+'% used)</div>'+
     '<div class="seo-meter" style="margin-bottom:8px"><div class="seo-fill '+(titlePct>=93?'seo-green':titlePct>=70?'seo-amber':'seo-red')+'" style="width:'+titlePct+'%"></div></div>'+
     '<div class="mtitle">'+escHtml(l.title||'No title')+'</div>'+
     '<div class="missues" style="margin-top:8px">'+tR.issues.map(i=>'<div class="miss '+i.type+'"><span>'+i.icon+'</span><span>'+i.msg+'</span></div>').join('')+'</div></div>'+
     '<div class="msec"><div class="mlbl">TAGS ('+((l.tags||[]).length)+'/13)</div>'+
     '<div class="mtags" style="margin-bottom:8px">'+((l.tags||[]).map(t=>'<span class="mtag ltag '+(badSet.has(t)?'bad':warnSet.has(t)?'warn':'')+'">'+escHtml(t)+' <span style="opacity:.5;font-size:9px">'+t.length+'</span></span>')).join('')+(!((l.tags||[]).length)?'<span style="color:var(--red);font-size:12px">No tags found</span>':'')+'</div>'+
     '<div class="missues">'+gR.issues.map(i=>'<div class="miss '+i.type+'"><span>'+i.icon+'</span><span>'+i.msg+'</span></div>').join('')+'</div>'+
-    (newSug.length?'<div style="margin-top:10px"><div class="nano-lbl">ð¡ Suggested new tags</div><div class="mtags">'+newSug.map(s=>'<span class="mtag ltag" style="cursor:pointer;border-color:var(--blue)" onclick="this.classList.add(\'kw-selected\')">+ '+escHtml(s)+'</span>').join('')+'</div></div>':'')+'</div>'+
+    (newSug.length?'<div style="margin-top:10px"><div class="nano-lbl">&#x1F4A1; Suggested new tags</div><div class="mtags">'+newSug.map(s=>'<span class="mtag ltag" style="cursor:pointer;border-color:var(--blue)" onclick="this.classList.add(\'kw-selected\')">+ '+escHtml(s)+'</span>').join('')+'</div></div>':'')+'</div>'+
     '<div class="msec"><div class="mlbl">PRICE ANALYSIS</div>'+
     '<div class="pgrid">'+
     '<div class="pcell"><div class="pl">Your Price</div><div class="pv" style="color:'+(pR.current<pR.ideal-10?'var(--red)':'var(--text)')+'">$'+pR.current+'</div></div>'+
@@ -724,29 +724,29 @@ function openModal(l) {
     '</div></div>'+
     '<div class="msec"><div class="mlbl">OPTIMIZED TITLE SUGGESTION</div>'+
     '<div class="opt-title-box">'+escHtml(ot)+'</div>'+
-    '<button class="cbtn" id="copy-ot">ð Copy optimized title</button></div>'+
+    '<button class="cbtn" id="copy-ot">&#x1F4CB; Copy optimized title</button></div>'+
     '<div class="msec"><div class="mlbl">AI PHOTO PROMPT (Gemini/Midjourney)</div>'+
-    '<div class="nano-box"><div class="nano-lbl">â¨ Paste into Gemini or Midjourney</div><div class="nano-txt">'+nb+'</div></div>'+
-    '<button class="cbtn secondary" id="copy-nb">ð Copy AI photo prompt</button></div>';
+    '<div class="nano-box"><div class="nano-lbl">&#x2728; Paste into Gemini or Midjourney</div><div class="nano-txt">'+nb+'</div></div>'+
+    '<button class="cbtn secondary" id="copy-nb">&#x1F4CB; Copy AI photo prompt</button></div>';
 
   document.getElementById('copy-ot').onclick=()=>{
-    navigator.clipboard.writeText(ot).then(()=>{document.getElementById('copy-ot').textContent='â Copied!';setTimeout(()=>{document.getElementById('copy-ot').innerHTML='ð Copy optimized title';},2000);});
+    navigator.clipboard.writeText(ot).then(()=>{document.getElementById('copy-ot').textContent='&#x2713; Copied!';setTimeout(()=>{document.getElementById('copy-ot').innerHTML='&#x1F4CB; Copy optimized title';},2000);});
   };
   document.getElementById('copy-nb').onclick=()=>{
-    navigator.clipboard.writeText(nb).then(()=>{document.getElementById('copy-nb').textContent='â Copied!';setTimeout(()=>{document.getElementById('copy-nb').innerHTML='ð Copy AI photo prompt';},2000);});
+    navigator.clipboard.writeText(nb).then(()=>{document.getElementById('copy-nb').textContent='&#x2713; Copied!';setTimeout(()=>{document.getElementById('copy-nb').innerHTML='&#x1F4CB; Copy AI photo prompt';},2000);});
   };
   document.getElementById('modal').classList.add('open');
 }
 
 // ===================== KEYWORD EXPLORER =====================
 const KW_DATA = {
-  'flower jewelry':    [{kw:'real flower necklace',vol:8900,comp:62,trend:'â'},{kw:'botanical jewelry',vol:12400,comp:78,trend:'â'},{kw:'pressed flower jewelry',vol:6200,comp:55,trend:'â'},{kw:'resin flower jewelry',vol:4800,comp:48,trend:'â'},{kw:'preserved flower necklace',vol:3900,comp:42,trend:'â'},{kw:'flower pendant necklace',vol:5600,comp:60,trend:'â'},{kw:'handmade flower earrings',vol:3200,comp:38,trend:'â'},{kw:'cottagecore jewelry',vol:9800,comp:72,trend:'â'},{kw:'floral resin ring',vol:2800,comp:35,trend:'â'},{kw:'nature jewelry gift',vol:7100,comp:65,trend:'â'}],
-  'botanical ring':    [{kw:'real flower ring',vol:5400,comp:52,trend:'â'},{kw:'botanical ring',vol:3800,comp:44,trend:'â'},{kw:'resin ring flower',vol:2900,comp:38,trend:'â'},{kw:'adjustable flower ring',vol:4200,comp:50,trend:'â'},{kw:'statement floral ring',vol:1800,comp:30,trend:'â'},{kw:'nature ring gift',vol:3100,comp:42,trend:'â'},{kw:'preserved flower ring',vol:2200,comp:35,trend:'â'},{kw:'cottagecore ring',vol:4500,comp:55,trend:'â'},{kw:'gold flower ring',vol:6700,comp:75,trend:'â'},{kw:'handmade botanical ring',vol:1600,comp:28,trend:'â'}],
-  'resin necklace':    [{kw:'resin flower necklace',vol:5200,comp:56,trend:'â'},{kw:'resin pendant necklace',vol:7800,comp:68,trend:'â'},{kw:'handmade resin jewelry',vol:9400,comp:74,trend:'â'},{kw:'floral resin necklace',vol:3600,comp:45,trend:'â'},{kw:'botanical resin pendant',vol:2400,comp:32,trend:'â'},{kw:'nature resin necklace',vol:3100,comp:40,trend:'â'},{kw:'cottagecore necklace',vol:6200,comp:62,trend:'â'},{kw:'boho resin jewelry',vol:4800,comp:55,trend:'â'},{kw:'real flower pendant',vol:4100,comp:48,trend:'â'},{kw:'statement resin necklace',vol:2900,comp:38,trend:'â'}],
-  'orchid jewelry':    [{kw:'real orchid jewelry',vol:3200,comp:38,trend:'â'},{kw:'orchid necklace',vol:4800,comp:52,trend:'â'},{kw:'orchid pendant',vol:3600,comp:45,trend:'â'},{kw:'orchid earrings',vol:2900,comp:40,trend:'â'},{kw:'preserved orchid necklace',vol:2100,comp:30,trend:'â'},{kw:'orchid resin jewelry',vol:1800,comp:28,trend:'â'},{kw:'orchid ring',vol:1500,comp:25,trend:'â'},{kw:'botanical orchid gift',vol:2400,comp:35,trend:'â'},{kw:'orchid bridal jewelry',vol:1900,comp:32,trend:'â'},{kw:'orchid hair clip',vol:1200,comp:22,trend:'â'}],
-  'gift for her':      [{kw:'unique gift for her',vol:45000,comp:92,trend:'â'},{kw:'handmade jewelry gift',vol:28000,comp:88,trend:'â'},{kw:'botanical gift for her',vol:8400,comp:62,trend:'â'},{kw:'nature lover gift',vol:12000,comp:72,trend:'â'},{kw:'flower lover gift',vol:6800,comp:58,trend:'â'},{kw:'cottagecore gift',vol:9200,comp:65,trend:'â'},{kw:'bridal shower gift',vol:18000,comp:85,trend:'â'},{kw:'best friend gift',vol:35000,comp:90,trend:'â'},{kw:'birthday gift her',vol:52000,comp:95,trend:'â'},{kw:'personalized gift',vol:68000,comp:96,trend:'â'}],
+  'flower jewelry':    [{kw:'real flower necklace',vol:8900,comp:62,trend:'&#x2191;'},{kw:'botanical jewelry',vol:12400,comp:78,trend:'&#x2191;'},{kw:'pressed flower jewelry',vol:6200,comp:55,trend:'&#x2192;'},{kw:'resin flower jewelry',vol:4800,comp:48,trend:'&#x2191;'},{kw:'preserved flower necklace',vol:3900,comp:42,trend:'&#x2191;'},{kw:'flower pendant necklace',vol:5600,comp:60,trend:'&#x2192;'},{kw:'handmade flower earrings',vol:3200,comp:38,trend:'&#x2191;'},{kw:'cottagecore jewelry',vol:9800,comp:72,trend:'&#x2191;'},{kw:'floral resin ring',vol:2800,comp:35,trend:'&#x2191;'},{kw:'nature jewelry gift',vol:7100,comp:65,trend:'&#x2192;'}],
+  'botanical ring':    [{kw:'real flower ring',vol:5400,comp:52,trend:'&#x2191;'},{kw:'botanical ring',vol:3800,comp:44,trend:'&#x2191;'},{kw:'resin ring flower',vol:2900,comp:38,trend:'&#x2191;'},{kw:'adjustable flower ring',vol:4200,comp:50,trend:'&#x2192;'},{kw:'statement floral ring',vol:1800,comp:30,trend:'&#x2191;'},{kw:'nature ring gift',vol:3100,comp:42,trend:'&#x2192;'},{kw:'preserved flower ring',vol:2200,comp:35,trend:'&#x2191;'},{kw:'cottagecore ring',vol:4500,comp:55,trend:'&#x2191;'},{kw:'gold flower ring',vol:6700,comp:75,trend:'&#x2192;'},{kw:'handmade botanical ring',vol:1600,comp:28,trend:'&#x2191;'}],
+  'resin necklace':    [{kw:'resin flower necklace',vol:5200,comp:56,trend:'&#x2191;'},{kw:'resin pendant necklace',vol:7800,comp:68,trend:'&#x2192;'},{kw:'handmade resin jewelry',vol:9400,comp:74,trend:'&#x2191;'},{kw:'floral resin necklace',vol:3600,comp:45,trend:'&#x2191;'},{kw:'botanical resin pendant',vol:2400,comp:32,trend:'&#x2191;'},{kw:'nature resin necklace',vol:3100,comp:40,trend:'&#x2192;'},{kw:'cottagecore necklace',vol:6200,comp:62,trend:'&#x2191;'},{kw:'boho resin jewelry',vol:4800,comp:55,trend:'&#x2192;'},{kw:'real flower pendant',vol:4100,comp:48,trend:'&#x2191;'},{kw:'statement resin necklace',vol:2900,comp:38,trend:'&#x2191;'}],
+  'orchid jewelry':    [{kw:'real orchid jewelry',vol:3200,comp:38,trend:'&#x2191;'},{kw:'orchid necklace',vol:4800,comp:52,trend:'&#x2191;'},{kw:'orchid pendant',vol:3600,comp:45,trend:'&#x2191;'},{kw:'orchid earrings',vol:2900,comp:40,trend:'&#x2191;'},{kw:'preserved orchid necklace',vol:2100,comp:30,trend:'&#x2191;'},{kw:'orchid resin jewelry',vol:1800,comp:28,trend:'&#x2191;'},{kw:'orchid ring',vol:1500,comp:25,trend:'&#x2191;'},{kw:'botanical orchid gift',vol:2400,comp:35,trend:'&#x2192;'},{kw:'orchid bridal jewelry',vol:1900,comp:32,trend:'&#x2191;'},{kw:'orchid hair clip',vol:1200,comp:22,trend:'&#x2191;'}],
+  'gift for her':      [{kw:'unique gift for her',vol:45000,comp:92,trend:'&#x2192;'},{kw:'handmade jewelry gift',vol:28000,comp:88,trend:'&#x2192;'},{kw:'botanical gift for her',vol:8400,comp:62,trend:'&#x2191;'},{kw:'nature lover gift',vol:12000,comp:72,trend:'&#x2192;'},{kw:'flower lover gift',vol:6800,comp:58,trend:'&#x2191;'},{kw:'cottagecore gift',vol:9200,comp:65,trend:'&#x2191;'},{kw:'bridal shower gift',vol:18000,comp:85,trend:'&#x2192;'},{kw:'best friend gift',vol:35000,comp:90,trend:'&#x2192;'},{kw:'birthday gift her',vol:52000,comp:95,trend:'&#x2192;'},{kw:'personalized gift',vol:68000,comp:96,trend:'&#x2192;'}],
 };
-const DEFAULT_KW = [{kw:'real flower necklace',vol:8900,comp:62,trend:'â'},{kw:'botanical jewelry',vol:12400,comp:78,trend:'â'},{kw:'pressed flower jewelry',vol:6200,comp:55,trend:'â'},{kw:'resin flower jewelry',vol:4800,comp:48,trend:'â'},{kw:'preserved flower necklace',vol:3900,comp:42,trend:'â'},{kw:'flower pendant necklace',vol:5600,comp:60,trend:'â'},{kw:'handmade flower earrings',vol:3200,comp:38,trend:'â'},{kw:'cottagecore jewelry',vol:9800,comp:72,trend:'â'},{kw:'floral resin ring',vol:2800,comp:35,trend:'â'},{kw:'nature jewelry gift',vol:7100,comp:65,trend:'â'}];
+const DEFAULT_KW = [{kw:'real flower necklace',vol:8900,comp:62,trend:'&#x2191;'},{kw:'botanical jewelry',vol:12400,comp:78,trend:'&#x2191;'},{kw:'pressed flower jewelry',vol:6200,comp:55,trend:'&#x2192;'},{kw:'resin flower jewelry',vol:4800,comp:48,trend:'&#x2191;'},{kw:'preserved flower necklace',vol:3900,comp:42,trend:'&#x2191;'},{kw:'flower pendant necklace',vol:5600,comp:60,trend:'&#x2192;'},{kw:'handmade flower earrings',vol:3200,comp:38,trend:'&#x2191;'},{kw:'cottagecore jewelry',vol:9800,comp:72,trend:'&#x2191;'},{kw:'floral resin ring',vol:2800,comp:35,trend:'&#x2191;'},{kw:'nature jewelry gift',vol:7100,comp:65,trend:'&#x2192;'}];
 
 async function searchKeywords() {
   const q=(document.getElementById('kw-search-input').value||'').trim().toLowerCase();
@@ -768,7 +768,7 @@ async function searchKeywords() {
         const volPct=Math.round(r.vol/results.reduce((m,x)=>Math.max(m,x.vol),1)*100);
         const compColor=r.comp>=80?'var(--red)':r.comp>=60?'var(--amber)':'var(--green)';
         const compLabel=r.comp>=80?'High':r.comp>=60?'Medium':'Low';
-        const trendColor=r.trend==='â'?'var(--green)':r.trend==='â'?'var(--red)':'var(--text3)';
+        const trendColor=r.trend==='&#x2191;'?'var(--green)':r.trend==='&#x2193;'?'var(--red)':'var(--text3)';
         return '<tr><td><div class="kw-keyword">'+escHtml(r.kw)+'</div></td>'+
           '<td><div style="font-size:12px;font-family:DM Mono,monospace">'+r.vol.toLocaleString()+'</div><div class="vol-bar"><div class="vol-fill" style="width:'+volPct+'%"></div></div></td>'+
           '<td><span class="comp-dot" style="background:'+compColor+'"></span><span style="color:'+compColor+'">'+compLabel+' ('+r.comp+')</span></td>'+
@@ -777,7 +777,7 @@ async function searchKeywords() {
       }).join('')+
       '</tbody></table></div></div>'+
       '<div style="margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px">'+
-      '<div class="mlbl">ð¡ TAG SUGGESTIONS FROM THESE KEYWORDS</div>'+
+      '<div class="mlbl">&#x1F4A1; TAG SUGGESTIONS FROM THESE KEYWORDS</div>'+
       '<div class="mtags">'+results.slice(0,8).map(r=>'<span class="mtag ltag" style="cursor:pointer" onclick="navigator.clipboard.writeText(r.kw)">'+escHtml(r.kw)+'</span>').join('')+'</div></div>';
     area.innerHTML=html;
   },600);
@@ -833,7 +833,7 @@ function renderTrends(filter) {
   if(!grid) return;
   grid.innerHTML = data.map(t=>{
     const badgeClass = t.status==='hot'?'trend-hot':t.status==='up'?'trend-up':t.status==='warm'?'trend-warm':'trend-cool';
-    const badgeText = t.status==='hot'?'ð¥ Hot':t.status==='up'?'â¬ï¸ Rising':t.status==='warm'?'ð¡ Warm':'ðµ Cool';
+    const badgeText = t.status==='hot'?'&#x1F525; Hot':t.status==='up'?'&#x2B06;&#xFE0F; Rising':t.status==='warm'?'&#x1F7E1; Warm':'&#x1F535; Cool';
     return '<div class="trend-card" onclick="navigator.clipboard.writeText(this.children[0].textContent)">'+
       '<div class="trend-tag">'+escHtml(t.tag)+'</div>'+
       '<div class="trend-meta">'+
@@ -905,7 +905,7 @@ async function searchCompetitors() {
     const listings = d.top_listings || [];
     if(!listings.length) { grid.innerHTML = '<div style="color:var(--text2);padding:20px">No results found.</div>'; return; }
     grid.innerHTML = listings.slice(0,6).map((l,i) => {
-      const emojis = ['ð¿','ð¸','ð','ðº','ð±','ð'];
+      const emojis = ['&#x1F33F;','&#x1F338;','&#x1F48E;','&#x1F33A;','&#x1F331;','&#x1F343;'];
       const price = l.price ? (typeof l.price === 'string' ? parseFloat(l.price) : (l.price.amount/l.price.divisor)).toFixed(2) : '--';
       return '<div class="comp-card">'+
         '<div class="comp-header">'+
@@ -970,11 +970,11 @@ function analyzeShop() {
         '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">'+
         '<div class="mlbl">SEO RECOMMENDATIONS</div>'+
         '<div class="missues">'+
-        (noTagCount>0?'<div class="miss error"><span>ð·ï¸</span><span>'+noTagCount+' listings have incomplete tags. Add all 13 tags to each listing.</span></div>':'')+
-        (avgScore<70?'<div class="miss warning"><span>ð</span><span>Average SEO score is '+avgScore+'. Focus on longer, keyword-rich titles (130+ chars).</span></div>':'')+
-        (avgScore>=70?'<div class="miss success"><span>â</span><span>Good average SEO score! Keep optimizing titles and tags consistently.</span></div>':'')+
-        '<div class="miss warning"><span>ð¡</span><span>Use trending tags like "cottagecore jewelry", "real flower necklace", and "botanical gift" across your listings.</span></div>'+
-        '<div class="miss success"><span>â</span><span>Great product diversity! '+listings.length+' active listings is excellent for Etsy visibility.</span></div>'+
+        (noTagCount>0?'<div class="miss error"><span>&#x1F3F7;&#xFE0F;</span><span>'+noTagCount+' listings have incomplete tags. Add all 13 tags to each listing.</span></div>':'')+
+        (avgScore<70?'<div class="miss warning"><span>&#x1F4CF;</span><span>Average SEO score is '+avgScore+'. Focus on longer, keyword-rich titles (130+ chars).</span></div>':'')+
+        (avgScore>=70?'<div class="miss success"><span>&#x2705;</span><span>Good average SEO score! Keep optimizing titles and tags consistently.</span></div>':'')+
+        '<div class="miss warning"><span>&#x1F4A1;</span><span>Use trending tags like "cottagecore jewelry", "real flower necklace", and "botanical gift" across your listings.</span></div>'+
+        '<div class="miss success"><span>&#x2705;</span><span>Great product diversity! '+listings.length+' active listings is excellent for Etsy visibility.</span></div>'+
         '</div></div>';
     } else {
       const fakeScore = 72+Math.floor(Math.random()*20);
@@ -987,7 +987,7 @@ function analyzeShop() {
         '<div class="shop-card"><div class="sl">EST. MONTHLY VIEWS</div><div style="font-size:28px;font-weight:700;font-family:DM Mono,monospace">'+Math.floor(Math.random()*5000+2000)+'</div></div>'+
         '</div>'+
         '<div style="padding:20px;background:var(--amber-dim);border:1px solid rgba(245,166,35,.3);border-radius:8px;font-size:12px;color:var(--amber)">'+
-        'â ï¸ Full analysis available for shops connected via Etsy API. Showing estimated data only for "'+escHtml(shopName)+'".</div>';
+        '&#x26A0;&#xFE0F; Full analysis available for shops connected via Etsy API. Showing estimated data only for "'+escHtml(shopName)+'".</div>';
     }
   }, 700);
 }
@@ -1074,7 +1074,7 @@ function renderTagPills() {
   currentGraderTags.forEach((tag,i)=>{
     const pill=document.createElement('span');
     pill.className='tag-pill';
-    pill.innerHTML=escHtml(tag)+' <span class="tag-pill-rm" onclick="currentGraderTags.splice('+i+',1);renderTagPills()">Ã</span>';
+    pill.innerHTML=escHtml(tag)+' <span class="tag-pill-rm" onclick="currentGraderTags.splice('+i+',1);renderTagPills()">&#xD7;</span>';
     wrap.insertBefore(pill,input);
   });
   if(countEl) countEl.textContent=currentGraderTags.length;
@@ -1110,20 +1110,20 @@ function runGrader() {
     '<div class="grade-score-circle '+(score>=75?'score-great':score>=50?'score-good':'score-bad')+'">'+score+'</div>'+
     '<div style="font-size:14px;font-weight:700;color:'+(score>=75?'var(--green)':score>=50?'var(--amber)':'var(--red)')+'">'+
     (score>=75?'Great SEO!':score>=50?'Needs Improvement':'Needs Work')+'</div></div>'+
-    '<div class="msec"><div class="mlbl">TITLE ('+titleLen+'/140 chars â '+titlePct+'% used)</div>'+
+    '<div class="msec"><div class="mlbl">TITLE ('+titleLen+'/140 chars &#x2014; '+titlePct+'% used)</div>'+
     '<div class="seo-meter" style="margin-bottom:8px"><div class="seo-fill '+(titlePct>=93?'seo-green':titlePct>=70?'seo-amber':'seo-red')+'" style="width:'+titlePct+'%"></div></div>'+
     (title?'<div class="mtitle">'+escHtml(title)+'</div>':'')+
     '<div class="missues" style="margin-top:8px">'+tR.issues.map(i=>'<div class="miss '+i.type+'"><span>'+i.icon+'</span><span>'+i.msg+'</span></div>').join('')+'</div></div>'+
     '<div class="msec"><div class="mlbl">TAGS ('+currentGraderTags.length+'/13)</div>'+
     (currentGraderTags.length?'<div class="mtags" style="margin-bottom:8px">'+currentGraderTags.map(t=>'<span class="mtag ltag">'+escHtml(t)+' <span style="opacity:.5;font-size:9px">'+t.length+'</span></span>').join('')+'</div>':'')+
     '<div class="missues">'+gR.issues.map(i=>'<div class="miss '+i.type+'"><span>'+i.icon+'</span><span>'+i.msg+'</span></div>').join('')+'</div>'+
-    (newSug.length?'<div style="margin-top:10px"><div class="nano-lbl">ð¡ Add these tags to fill remaining slots</div><div class="mtags">'+newSug.map(s=>'<span class="mtag ltag" style="cursor:pointer;border-color:var(--blue)" onclick="if(currentGraderTags.length<13){currentGraderTags.push(s);renderTagPills();this.classList.add(\'active\')}">+ '+escHtml(s)+'</span>').join('')+'</div></div>':'')+'</div>'+
+    (newSug.length?'<div style="margin-top:10px"><div class="nano-lbl">&#x1F4A1; Add these tags to fill remaining slots</div><div class="mtags">'+newSug.map(s=>'<span class="mtag ltag" style="cursor:pointer;border-color:var(--blue)" onclick="if(currentGraderTags.length<13){currentGraderTags.push(s);renderTagPills();this.classList.add(\'active\')}">+ '+escHtml(s)+'</span>').join('')+'</div></div>':'')+'</div>'+
     '<div class="msec"><div class="mlbl">OPTIMIZED TITLE SUGGESTION</div>'+
     '<div class="opt-title-box">'+escHtml(ot)+'</div>'+
-    '<button class="cbtn" onclick="navigator.clipboard.writeText(ot)" >ð Copy Optimized Title</button></div>'+
+    '<button class="cbtn" onclick="navigator.clipboard.writeText(ot)" >&#x1F4CB; Copy Optimized Title</button></div>'+
     '<div class="msec"><div class="mlbl">AI PHOTO PROMPT</div>'+
-    '<div class="nano-box"><div class="nano-lbl">â¨ Paste into Gemini or Midjourney</div><div class="nano-txt">'+escHtml(nb)+'</div></div>'+
-    '<button class="cbtn secondary" onclick="navigator.clipboard.writeText(nb)" >ð Copy AI Photo Prompt</button></div>';
+    '<div class="nano-box"><div class="nano-lbl">&#x2728; Paste into Gemini or Midjourney</div><div class="nano-txt">'+escHtml(nb)+'</div></div>'+
+    '<button class="cbtn secondary" onclick="navigator.clipboard.writeText(nb)" >&#x1F4CB; Copy AI Photo Prompt</button></div>';
 }
 
 // ===================== HEALTH CHECK =====================
@@ -1142,11 +1142,11 @@ async function runHealthCheck() {
         <div class="stat"><div class="sl">Con Problemas</div><div class="sv" style="color:var(--red)">${data.total_issues}</div></div>
         <div class="stat"><div class="sl">Sin Problemas</div><div class="sv" style="color:var(--green)">${data.total - data.total_issues}</div></div>
       </div>
-      ${data.total_issues === 0 ? '<div style="padding:20px;background:var(--green-dim);border:1px solid var(--green);border-radius:10px;color:var(--green);text-align:center">â All good! No listings have issues.</div>' : ''}
+      ${data.total_issues === 0 ? '<div style="padding:20px;background:var(--green-dim);border:1px solid var(--green);border-radius:10px;color:var(--green);text-align:center">&#x2705; All good! No listings have issues.</div>' : ''}
       <div style="display:flex;flex-direction:column;gap:8px">
         ${(data.flagged || []).map(l => `
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px">
-            <div style="font-size:12px;font-weight:500;margin-bottom:8px">${escHtml(l.title || 'Sin tÃ­tulo')}</div>
+            <div style="font-size:12px;font-weight:500;margin-bottom:8px">${escHtml(l.title || 'Sin t&#xED;tulo')}</div>
             <div style="display:flex;flex-wrap:wrap;gap:6px">
               ${l.problems.map(p => `<span style="background:var(--red-dim);color:var(--red);border:1px solid rgba(255,79,79,.3);font-size:10px;padding:3px 10px;border-radius:20px">${escHtml(p)}</span>`).join('')}
             </div>
@@ -1220,7 +1220,7 @@ async function runTopSellers() {
             ${(d.results||[]).slice(0,8).map(l => `
               <div style="font-size:11px;border-bottom:1px solid var(--border);padding-bottom:6px">
                 <a href="${l.url||'#'}" target="_blank" style="color:var(--text);text-decoration:none;font-weight:500">${escHtml((l.title||'').substring(0,55))}...</a>
-                <div style="color:var(--text2);margin-top:2px">$${l.price}  | â¤ï¸ ${l.num_favorers}  | ð ${l.views}</div>
+                <div style="color:var(--text2);margin-top:2px">$${l.price}  | &#x2764;&#xFE0F; ${l.num_favorers}  | &#x1F441; ${l.views}</div>
               </div>`).join('')}
           </div>
         </div>
@@ -1293,7 +1293,7 @@ async function init() {
     document.getElementById('loading-section').style.display='none';
     document.getElementById('dashboard').style.display='block';
     document.getElementById('sdot').className='status-dot dot-live';
-    document.getElementById('stxt').textContent='Live â '+SHOP+' ('+totalCount+')';
+    document.getElementById('stxt').textContent='Live &#x2014; '+SHOP+' ('+totalCount+')';
     renderStats(allListings);
     renderGrid(allListings);
     if(totalCount>25){
