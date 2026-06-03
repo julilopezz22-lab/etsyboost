@@ -17,7 +17,6 @@ export default async function handler(req, res) {
   const key = (API_KEY || '').trim();
   const secret = (API_SECRET || '').trim();
   const authKey = (key && secret) ? key + ':' + secret : (key || 'a6hs9rn9rx9t4dyja72xwmpc:lpggidhncm');
-
   const headers = { 'x-api-key': authKey, 'Accept': 'application/json' };
 
   try {
@@ -30,7 +29,7 @@ export default async function handler(req, res) {
       if (!shopId) return res.status(404).json({ error: 'Shop not found: ' + shop });
     }
 
-    // Step 1: get listings (no includes, faster)
+    // Step 1: get listings
     const listUrl = 'https://openapi.etsy.com/v3/application/shops/' + shopId + '/listings/active?limit=' + limit + '&offset=' + offset;
     const listRes = await fetch(listUrl, { headers });
     if (!listRes.ok) {
@@ -40,28 +39,26 @@ export default async function handler(req, res) {
     const data = await listRes.json();
     const listings = data.results || [];
 
-    // Step 2: batch fetch images for all listing IDs
-    let imageMap = {};
+    // Step 2: fetch images in parallel for all listings
+    // Using /v3/application/listings/{id}/images endpoint (public, no OAuth needed)
+    const imageMap = {};
     if (listings.length > 0) {
-      const ids = listings.map(l => l.listing_id).join(',');
-      const imgUrl = 'https://openapi.etsy.com/v3/application/listings?listing_ids=' + ids + '&includes=Images,MainImage';
-      try {
-        const imgRes = await fetch(imgUrl, { headers });
-        if (imgRes.ok) {
-          const imgData = await imgRes.json();
-          for (const l of (imgData.results || [])) {
-            imageMap[l.listing_id] = {
-              MainImage: l.MainImage || null,
-              Images: l.Images || []
-            };
+      const imageFetches = listings.map(async l => {
+        try {
+          const imgRes = await fetch('https://openapi.etsy.com/v3/application/listings/' + l.listing_id + '/images', { headers });
+          if (imgRes.ok) {
+            const imgData = await imgRes.json();
+            imageMap[l.listing_id] = imgData.results || [];
           }
-        }
-      } catch(e) {}
+        } catch(e) {}
+      });
+      await Promise.all(imageFetches);
     }
 
-    // Step 3: merge image data into listings
+    // Step 3: merge
     const results = listings.map(l => {
-      const imgs = imageMap[l.listing_id] || {};
+      const imgs = imageMap[l.listing_id] || [];
+      const mainImg = imgs[0] || null;
       return {
         listing_id: l.listing_id,
         title: l.title,
@@ -73,8 +70,8 @@ export default async function handler(req, res) {
         quantity: l.quantity,
         state: l.state,
         url: l.url,
-        primary_image: imgs.MainImage || null,
-        images: imgs.Images || [],
+        primary_image: mainImg,
+        images: imgs,
         created_timestamp: l.created_timestamp,
         last_modified_timestamp: l.last_modified_timestamp
       };
