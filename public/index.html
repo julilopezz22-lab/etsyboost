@@ -792,7 +792,7 @@ async function loadTrendingTags() {
   if (_trendingDataCache) { renderTrends(_trendingCurrentFilter); return; }
   grid.innerHTML = '<div class="loading"><div class="spin"></div><p>Loading trending tags from Etsy...</p></div>';
   try {
-    const kws = ['orchid pendant','preserved flower jewelry','botanical resin jewelry','real flower necklace','cottagecore necklace','botanical earrings','resin ring handmade','nature jewelry gift','pressed flower jewelry','bridal flower jewelry','dainty botanical necklace','boho resin jewelry'];
+    const kws = ['orchid pendant','dainty botanical necklace','botanical resin jewelry','real flower necklace','botanical earrings','boho resin jewelry','preserved flower jewelry','cottagecore necklace'];
     const res = await fetch('/api/trends?keywords=' + encodeURIComponent(kws.join(',')));
     if (!res.ok) throw new Error('API error ' + res.status);
     const d = await res.json();
