@@ -1,9 +1,10 @@
-const ETSY_KEY = process.env.ETSY_API_KEY || 'a6hs9rn9rx9t4dyja72xwmpc';
-
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   const keyword = req.query.keyword || req.query.q || '';
   if (!keyword) return res.status(400).json({ error: 'keyword required' });
+
+  const KEYSTRING = process.env.ETSY_KEYSTRING || 'a6hs9rn9rx9t4dyja72xwmpc';
+  const SHARED_SECRET = process.env.ETSY_SHARED_SECRET || 'lpggidhncm';
 
   let etsyResults = [];
   let listingCount = 0;
@@ -14,7 +15,8 @@ module.exports = async (req, res) => {
         encodeURIComponent(keyword) + '&limit=25&sort_on=score&includes=Images';
     const r = await fetch(url, {
       headers: {
-        'x-api-key': 'a6hs9rn9rx9t4dyja72xwmpc',
+        'x-api-key': KEYSTRING,
+        'Authorization': 'Basic ' + Buffer.from(KEYSTRING + ':' + SHARED_SECRET).toString('base64'),
         'Accept': 'application/json'
       }
     });
@@ -38,11 +40,10 @@ module.exports = async (req, res) => {
       }));
     } else {
       const errText = await r.text();
-      debugInfo += ' err:' + errText.substring(0, 100);
+      debugInfo += ' err:' + errText.substring(0, 150);
     }
   } catch (e) {
     debugInfo = 'exception:' + e.message;
-    console.error('Etsy search error:', e.message);
   }
 
   const mainVolume = listingCount > 0
