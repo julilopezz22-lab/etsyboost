@@ -12,7 +12,6 @@ export default async function handler(req, res) {
   const { keywords } = req.query;
   if (!keywords) return res.status(400).json({ error: 'keywords requerido (separados por coma)' });
 
-  // Limit to 8 keywords max to respect rate limits
   const kwList = keywords.split(',').map(k => k.trim()).filter(Boolean).slice(0, 8);
 
   const key = (API_KEY || '').trim();
@@ -21,8 +20,10 @@ export default async function handler(req, res) {
 
   try {
     const results = [];
-    // Sequential with delay to avoid 429 rate limit (5 QPS)
-    for (const kw of kwList) {
+    for (let i = 0; i < kwList.length; i++) {
+      const kw = kwList[i];
+      // 500ms delay between calls = 2 QPS (safely under 5 QPS limit)
+      if (i > 0) await sleep(500);
       try {
         const url = 'https://openapi.etsy.com/v3/application/listings/active?keywords=' +
           encodeURIComponent(kw) + '&limit=25&sort_on=score&sort_order=desc';
@@ -30,6 +31,8 @@ export default async function handler(req, res) {
           headers: { 'x-api-key': authKey, 'Accept': 'application/json' }
         });
         if (!r.ok) {
+          // On 429, wait 1s extra and skip
+          if (r.status === 429) await sleep(1000);
           results.push({ keyword: kw, count: 0, avg_favorers: 0, avg_views: 0, change: '+1%', demand_score: 0 });
         } else {
           const data = await r.json();
@@ -37,15 +40,15 @@ export default async function handler(req, res) {
           const totalFavs = listings.reduce((s, l) => s + (l.num_favorers || 0), 0);
           const totalViews = listings.reduce((s, l) => s + (l.views || 0), 0);
           const avgFavs = listings.length ? (totalFavs / listings.length) : 0;
-          const avgViews = listings.length ? (totalViews / listings.length) : 0;
-          const demandScore = (data.count || 0) > 0 
-            ? Math.round((avgFavs / Math.max(1, (data.count || 1) / 1000)) * 10) 
+          const count = data.count || 0;
+          const demandScore = count > 0
+            ? Math.round((avgFavs / Math.max(1, count / 1000)) * 10)
             : 0;
           results.push({
             keyword: kw,
-            count: data.count || 0,
+            count,
             avg_favorers: parseFloat(avgFavs.toFixed(1)),
-            avg_views: parseFloat(avgViews.toFixed(1)),
+            avg_views: listings.length ? parseFloat((totalViews / listings.length).toFixed(1)) : 0,
             change: '+' + Math.min(99, Math.max(1, demandScore)) + '%',
             demand_score: demandScore
           });
@@ -53,8 +56,6 @@ export default async function handler(req, res) {
       } catch(e) {
         results.push({ keyword: kw, count: 0, avg_favorers: 0, avg_views: 0, change: '+1%', demand_score: 0 });
       }
-      // 250ms delay between calls to stay under 5 QPS
-      await sleep(250);
     }
     return res.status(200).json({ trends: results });
   } catch (e) {
