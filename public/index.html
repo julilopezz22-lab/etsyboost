@@ -719,175 +719,114 @@ function openInstagramPanel(listing) {
 }
 
 function generateInstagramContent() {
-  const l = _igCurrentListing;
-  if (!l) return;
+    const l = _igCurrentListing;
+    if (!l) return;
+    const price = l._price || '0';
+    const title = l.title || '';
+    const tags = (l.tags || []).join(', ');
+    const type = l._type || 'jewelry';
+    const photoCount = (_igCurrentImages||[]).length;
+    const prompt = `You are the creative director of a luxury botanical jewelry brand. JulietShopp creates handmade resin jewelry with real preserved flowers — each piece is one-of-a-kind, artisan-crafted, for an upscale English-speaking US audience. Think Mejuri meets nature. Sophisticated, minimal, aspirational.
 
-  const price = l._price || '0';
-  const title = l.title || '';
-  const tags = (l.tags || []).join(', ');
-  const type = l._type || 'jewelry';
-  const photoCount = (_igCurrentImages||[]).length;
+    LISTING:
+    - Title: ${title}
+    - Price: $${price}
+    - Type: ${type}
+    - Tags: ${tags}
+    - Photos available: ${photoCount} (Photo 1, Photo 2, etc.)
 
-  const prompt = `You are the creative director of a luxury botanical jewelry brand. JulietShopp creates handmade resin jewelry with real preserved flowers — each piece is one-of-a-kind, artisan-crafted, for an upscale English-speaking US audience. Think Mejuri meets nature. Sophisticated, minimal, aspirational.
+    Generate ALL of the following in English. Write like a luxury brand — restrained, evocative, confident. No generic filler. No "handmade with love".
 
-LISTING:
-- Title: ${title}
-- Price: $${price}
-- Type: ${type}
-- Tags: ${tags}
-- Photos available: ${photoCount} (Photo 1, Photo 2, etc.)
+    ---
 
-Generate ALL of the following in English. Write like a luxury brand — restrained, evocative, confident. No generic filler. No "handmade with love".
+    🎬 REEL SCRIPT (22 seconds)
+    SCENE 1 — Hook (0-2s)
+    🎙 Voiceover: [one arresting line, max 8 words]
+    📸 Photo: [which photo + exact direction: angle, crop, movement]
+    🎬 Edit: [pacing note]
 
----
-🎬 REEL SCRIPT (22 seconds)
+    SCENE 2 — Craft (3-8s)
+    🎙 Voiceover: [what makes this piece]
+    📸 Photo: [specific direction]
+    🎬 Edit: [note]
 
-SCENE 1 — Hook (0-2s)
-🎙 Voiceover: [one arresting line, max 8 words]
-📸 Photo: [which photo + exact direction: angle, crop, movement]
-🎬 Edit: [pacing note]
+    SCENE 3 — The Detail (9-13s)
+    🎙 Voiceover: [the thing no one else offers]
+    📸 Photo: [macro, texture, light direction]
+    🎬 Edit: [note]
 
-SCENE 2 — Craft (3-8s)
-🎙 Voiceover: [what makes this piece]
-📸 Photo: [specific direction]
-🎬 Edit: [note]
+              SCENE 4 — Emotion (14-18s)
+              🎙 Voiceover: [who this is for, without being generic]
+              📸 Photo: [specific direction]
+              🎬 Edit: [note]
 
-SCENE 3 — The Detail (9-13s)
-🎙 Voiceover: [the thing no one else offers]
-📸 Photo: [macro, texture, light direction]
-🎬 Edit: [note]
+              SCENE 5 — CTA (19-22s)
+              🎙 Voiceover: [elegant scarcity, one-of-a-kind]
+              📸 Photo: [specific direction]
+              🎬 Edit: [text overlay note]
 
-SCENE 4 — Emotion (14-18s)
-🎙 Voiceover: [who this is for, without being generic]
-📸 Photo: [specific direction]
-🎬 Edit: [note]
+              ---
 
-SCENE 5 — CTA (19-22s)
-🎙 Voiceover: [elegant scarcity, one-of-a-kind]
-📸 Photo: [specific direction]
-🎬 Edit: [text overlay note]
+              🖼 CAROUSEL (5 slides)
+              SLIDE 1 — Cover
+              Headline: [max 6 words, typographic, no punctuation]
+              📸 Photo: [which photo, full bleed, how to crop]
 
----
-🖼 CAROUSEL (5 slides)
+              SLIDE 2 — The Piece
+              Copy: [2 lines, poetic and precise]
+              📸 Photo: [direction]
 
-SLIDE 1 — Cover
-Headline: [max 6 words, typographic, no punctuation]
-📸 Photo: [which photo, full bleed, how to crop]
+              SLIDE 3 — The Craft
+              Copy: [2 lines about preservation, elevated language]
+              📸 Photo: [macro or detail]
 
-SLIDE 2 — The Piece
-Copy: [2 lines, poetic and precise]
-📸 Photo: [direction]
+              SLIDE 4 — For Her
+              Copy: [2 lines, occasion or mood, aspirational]
+              📸 Photo: [direction]
 
-SLIDE 3 — The Craft
-Copy: [2 lines about preservation, elevated language]
-📸 Photo: [macro or detail]
+              SLIDE 5 — CTA
+              Copy: [scarcity + link in bio, max 2 lines]
+              📸 Photo: [cleanest shot, centered]
 
-SLIDE 4 — For Her
-Copy: [2 lines, occasion or mood, aspirational]
-📸 Photo: [direction]
+              ---
 
-SLIDE 5 — CTA
-Copy: [scarcity + link in bio, max 2 lines]
-📸 Photo: [cleanest shot, centered]
+              ✍️ CAPTION
+              [3 short editorial paragraphs, max 150 words total. Start with an image or feeling, not a product description. End with: Link in bio → Shop JulietShopp on Etsy]
 
----
-✍️ CAPTION
+              #botanicaljewelry #realjewelry #preservedflowers #resinjewelry #handmadejewelry #botanicalart #floraljewelry #slowfashion #artisanjewelry #uniquejewelry #giftforher #cottagecore #jewelrylovers #naturejewelry #etsyfinds
 
-[3 short editorial paragraphs, max 150 words total. Start with an image or feeling, not a product description. End with: Link in bio → Shop JulietShopp on Etsy]
+              ---
 
-#botanicaljewelry #realjewelry #preservedflowers #resinjewelry #handmadejewelry #botanicalart #floraljewelry #slowfashion #artisanjewelry #uniquejewelry #giftforher #cottagecore #jewelrylovers #naturejewelry #etsyfinds
-
----
-🪝 HOOKS (3 options)
-
-1. [visual/sensory — makes viewer stop]
-2. [question or desire-driven]
-3. [scarcity/exclusivity, elegant not pushy]`;
-
-  const contentArea = document.getElementById('ig-panel-content');
-
-  navigator.clipboard.writeText(prompt).then(() => {
-    contentArea.innerHTML =
-      '<div style="text-align:center;padding:20px 10px">'+
-      '<div style="font-size:32px;margin-bottom:10px">✅</div>'+
-      '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Prompt copied!</div>'+
-      '<div style="font-size:11px;color:var(--text2);margin-bottom:18px;line-height:1.6">Claude.ai opens in a new tab.<br>Just <strong>Ctrl+V</strong> and Enter — done.</div>'+
-      '<a href="https://claude.ai/new" target="_blank" rel="noopener" style="display:block;padding:12px;border-radius:8px;background:linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045);color:#fff;font-weight:700;font-size:13px;text-align:center;text-decoration:none;margin-bottom:16px">Open Claude.ai →</a>'+
-      '<div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:left;font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:14px">'+
-      '<strong style="color:var(--text)">After Claude generates:</strong><br>'+
-      '1. Copy reel script + caption<br>'+
-      '2. Open Meta Business Suite below<br>'+
-      '3. Paste and schedule ✓</div>'+
-      '<div style="padding:10px;background:rgba(24,119,242,0.08);border:1px solid rgba(24,119,242,0.25);border-radius:10px">'+
-      '<div style="font-size:10px;color:#4a9eff;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📱 Ready to post?</div>'+
-      '<a href="https://business.facebook.com/latest/composer/" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:7px;background:#1877f2;color:#fff;font-size:11px;font-weight:700;text-decoration:none">Open Meta Business Suite →</a>'+
-      '</div>'+
-      '<button onclick="generateInstagramContent()" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:11px;cursor:pointer">↺ Copy prompt again</button>'+
-      '</div>';
-    window.open('https://claude.ai/new', '_blank');
-  }).catch(() => {
-    contentArea.innerHTML =
-      '<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Copy this and paste in <a href="https://claude.ai/new" target="_blank" style="color:#833ab4">claude.ai</a>:</div>'+
-      '<textarea style="width:100%;height:180px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-size:10px;resize:none;outline:none;line-height:1.5" readonly>'+escHtml(prompt)+'</textarea>'+
-      '<button onclick="navigator.clipboard.writeText(document.querySelector('#ig-panel-content textarea').value).then(()=>{this.innerHTML='✅ Copied!';window.open('https://claude.ai/new','_blank')})" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045);border:none;color:#fff;font-weight:700;font-size:12px;cursor:pointer">📋 Copy & Open Claude.ai</button>';
-  });
-}
-function renderInstagramResult(data, listing) {
-  const area = document.getElementById('ig-panel-content');
-  const title = listing.title || '';
-  const price = listing._price || '0';
-  const imgs = _igCurrentImages || [];
-
-  // Photo strip
-  const photoStrip = imgs.length
-    ? '<div style="display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px">'+
-      imgs.slice(0,6).map((url,i)=>
-        '<div style="flex-shrink:0;text-align:center">'+
-        '<img src="'+url+'" style="width:52px;height:52px;object-fit:cover;border-radius:6px;border:1px solid var(--border2);display:block;">'+
-        '<div style="font-size:8px;color:var(--text3);margin-top:2px">Photo '+(i+1)+'</div>'+
-        '</div>'
-      ).join('')+
-      '</div>'
-    : '';
-
-  // Build caption for Meta button (plain text)
-  const captionPlain = (data.caption||'').replace(/<[^>]+>/g,'');
-  const metaUrl = 'https://business.facebook.com/latest/composer/?content='+encodeURIComponent(captionPlain.substring(0,2000));
-
-  area.innerHTML =
-    // Header
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:8px 10px;background:var(--bg3);border-radius:8px">'+
-    (imgs[0]?'<img src="'+imgs[0]+'" style="width:36px;height:36px;object-fit:cover;border-radius:6px;flex-shrink:0">':'')+
-    '<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(title.substring(0,50))+'...</div>'+
-    '<div style="font-size:10px;color:var(--text2)">$'+escHtml(price)+' &middot; '+imgs.length+' photos available</div></div>'+
-    '</div>'+
-    photoStrip+
-    // Tabs
-    '<div class="ig-tab-row">'+
-    '<button class="ig-tab active" onclick="switchIgTab(this,\'ig-reel\')">🎬 Reel</button>'+
-    '<button class="ig-tab" onclick="switchIgTab(this,\'ig-carousel\')">🖼 Carousel</button>'+
-    '<button class="ig-tab" onclick="switchIgTab(this,\'ig-caption\')">✍️ Caption</button>'+
-    '<button class="ig-tab" onclick="switchIgTab(this,\'ig-hooks\')">🪝 Hooks</button>'+
-    '</div>'+
-    // Content blocks
-    '<div class="ig-content-block active" id="ig-reel">'+escHtml(data.reel||'')+'</div>'+
-    '<div class="ig-content-block" id="ig-carousel">'+escHtml(data.carousel||'')+'</div>'+
-    '<div class="ig-content-block" id="ig-caption">'+escHtml(data.caption||'')+'</div>'+
-    '<div class="ig-content-block" id="ig-hooks">'+escHtml(data.hooks||'')+'</div>'+
-    // Action row
-    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;align-items:stretch">'+
-    '<button class="ig-copy-btn" style="flex:1" onclick="copyActiveIgTab()">📋 Copy tab</button>'+
-    '<button class="ig-copy-btn" style="flex:1" onclick="copyAllIg(\''+escHtml(JSON.stringify(data)).replace(/'/g,"&#39;")+'\')">📦 Copy all</button>'+
-    '<button class="ig-main-btn" style="margin:0;padding:9px 14px;font-size:10px;flex:1" onclick="generateInstagramContent()">↺ Regenerate</button>'+
-    '</div>'+
-    // Meta Business Suite button
-    '<div style="margin-top:10px;padding:10px;background:rgba(24,119,242,0.08);border:1px solid rgba(24,119,242,0.25);border-radius:10px">'+
-    '<div style="font-size:10px;color:#4a9eff;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">📱 Publish to Instagram</div>'+
-    '<div style="font-size:10px;color:var(--text3);margin-bottom:8px">Copy the caption first, then open Meta Business Suite to schedule or post.</div>'+
-    '<div style="display:flex;gap:6px">'+
-    '<button onclick="navigator.clipboard.writeText('+JSON.stringify(captionPlain)+').then(()=>{this.innerHTML=\'✅ Caption copied!\';setTimeout(()=>this.innerHTML=\'📋 Copy Caption\',2000)})" style="flex:1;padding:7px 10px;border-radius:7px;border:1px solid rgba(24,119,242,0.4);background:rgba(24,119,242,0.1);color:#4a9eff;font-size:10px;font-weight:600;cursor:pointer">📋 Copy Caption</button>'+
-    '<a href="'+metaUrl+'" target="_blank" rel="noopener" style="flex:1;padding:7px 10px;border-radius:7px;background:#1877f2;color:#fff;font-size:10px;font-weight:700;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:4px">Open Meta Business Suite →</a>'+
-    '</div></div>';
+              🪝 HOOKS (3 options)
+              1. [visual/sensory — makes viewer stop]
+              2. [question or desire-driven]
+              3. [scarcity/exclusivity, elegant not pushy]`;
+    const contentArea = document.getElementById('ig-panel-content');
+    navigator.clipboard.writeText(prompt).then(() => {
+          contentArea.innerHTML =
+                  '<div style="text-align:center;padding:20px 10px">'+
+                  '<div style="font-size:32px;margin-bottom:10px">✅</div>'+
+                  '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Prompt copied!</div>'+
+                  '<div style="font-size:11px;color:var(--text2);margin-bottom:18px;line-height:1.6">Claude.ai opens in a new tab.<br>Just <strong>Ctrl+V</strong> and Enter — done.</div>'+
+                  '<a href="https://claude.ai/new" target="_blank" rel="noopener" style="display:block;padding:12px;border-radius:8px;background:linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045);color:#fff;font-weight:700;font-size:13px;text-align:center;text-decoration:none;margin-bottom:16px">Open Claude.ai →</a>'+
+                  '<div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:left;font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:14px">'+
+                  '<strong style="color:var(--text)">After Claude generates:</strong><br>'+
+                  '1. Copy reel script + caption<br>'+
+                  '2. Open Meta Business Suite below<br>'+
+                  '3. Paste and schedule ✓</div>'+
+                  '<div style="padding:10px;background:rgba(24,119,242,0.08);border:1px solid rgba(24,119,242,0.25);border-radius:10px">'+
+                  '<div style="font-size:10px;color:#4a9eff;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📱 Ready to post?</div>'+
+                  '<a href="https://business.facebook.com/latest/composer/" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:7px;background:#1877f2;color:#fff;font-size:11px;font-weight:700;text-decoration:none">Open Meta Business Suite →</a>'+
+                  '</div>'+
+                  '<button onclick="generateInstagramContent()" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:11px;cursor:pointer">↺ Copy prompt again</button>'+
+                  '</div>';
+          window.open('https://claude.ai/new', '_blank');
+    }).catch(() => {
+          contentArea.innerHTML =
+                  '<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Copy this and paste in <a href="https://claude.ai/new" target="_blank" style="color:#833ab4">claude.ai</a>:</div>'+
+                  '<textarea style="width:100%;height:180px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-size:10px;resize:none;outline:none;line-height:1.5" readonly>'+escHtml(prompt)+'</textarea>'+
+                  '<button onclick="navigator.clipboard.writeText(document.querySelector(\'#ig-panel-content textarea\').value).then(()=>{this.innerHTML=\'✅ Copied!\';window.open(\'https://claude.ai/new\',\'_blank\')})" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045);border:none;color:#fff;font-weight:700;font-size:12px;cursor:pointer">📋 Copy & Open Claude.ai</button>';
+    });
 }
 
 function switchIgTab(btn, targetId) {
