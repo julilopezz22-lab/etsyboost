@@ -718,66 +718,120 @@ function openInstagramPanel(listing) {
   document.getElementById('ig-overlay').classList.add('open');
 }
 
-async function generateInstagramContent() {
+function generateInstagramContent() {
   const l = _igCurrentListing;
   if (!l) return;
-  const contentArea = document.getElementById('ig-panel-content');
-  contentArea.innerHTML =
-    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;gap:14px">'+
-    '<div class="spin" style="width:24px;height:24px;border-width:2px;border-top-color:#fd1d1d"></div>'+
-    '<div style="font-size:12px;color:var(--text2);text-align:center">Crafting sophisticated Instagram content...<br><span style="font-size:10px;color:var(--text3)">Writing luxury copy for an upscale audience</span></div>'+
-    '</div>';
 
   const price = l._price || '0';
   const title = l.title || '';
   const tags = (l.tags || []).join(', ');
   const type = l._type || 'jewelry';
   const photoCount = (_igCurrentImages||[]).length;
-  const hasPhotos = photoCount > 0;
 
-  const prompt = `You are the creative director of a luxury botanical jewelry brand. JulietShopp creates handmade resin jewelry with real preserved flowers — each piece is one-of-a-kind, artisan-crafted, and positioned for an upscale, aesthetically-driven English-speaking audience (US market). Think Mejuri meets nature. Sophisticated, minimal, aspirational.
+  const prompt = `You are the creative director of a luxury botanical jewelry brand. JulietShopp creates handmade resin jewelry with real preserved flowers — each piece is one-of-a-kind, artisan-crafted, for an upscale English-speaking US audience. Think Mejuri meets nature. Sophisticated, minimal, aspirational.
 
-This listing:
+LISTING:
 - Title: ${title}
 - Price: $${price}
-- Product type: ${type}
-- Tags/keywords: ${tags}
-- Available product photos: ${photoCount} (numbered Photo 1 through Photo ${photoCount})
+- Type: ${type}
+- Tags: ${tags}
+- Photos available: ${photoCount} (Photo 1, Photo 2, etc.)
 
-Generate premium Instagram content. RULES:
-- English only. No generic filler. No "handmade with love". 
-- Write like a luxury brand: restrained, evocative, confident. Short sentences. White space. Intention.
-- Every scene/slide must include a specific "📸 Photo:" direction referencing which of the ${hasPhotos ? photoCount+' available photos' : 'product photos'} to use and exactly how (angle, crop, lighting note).
-- Caption must feel editorial — think Vogue meets small brand. Max 150 words body, then hashtags.
-- Hooks must stop the scroll with intrigue or beauty, not hype.
+Generate ALL of the following in English. Write like a luxury brand — restrained, evocative, confident. No generic filler. No "handmade with love".
 
-Return ONLY valid JSON, no markdown, no backticks:
-{
-  "reel": "SCENE 1 — Hook (0–2s)\\n🎙 Voiceover: [one arresting line — max 8 words]\\n📸 Photo: [which photo, how to use it — e.g. 'Photo 1: slow push-in macro on the flower, dark background, no text']\\n🎬 Direction: [camera/edit note]\\n\\nSCENE 2 — Craft (3–8s)\\n🎙 Voiceover: [what makes this piece]\\n📸 Photo: [specific photo direction]\\n🎬 Direction: [edit note]\\n\\nSCENE 3 — The Detail (9–13s)\\n🎙 Voiceover: [the thing no one else offers]\\n📸 Photo: [specific photo direction — macro, texture, light]\\n🎬 Direction: [edit note]\\n\\nSCENE 4 — Emotion (14–18s)\\n🎙 Voiceover: [who this is for, without being basic]\\n📸 Photo: [specific photo direction]\\n🎬 Direction: [edit note]\\n\\nSCENE 5 — CTA (19–22s)\\n🎙 Voiceover: [elegant urgency — one-of-a-kind scarcity]\\n📸 Photo: [specific photo direction]\\n🎬 Direction: [text overlay note]",
-  "carousel": "SLIDE 1 — Cover\\n[ONE bold headline, max 6 words — typographic, no punctuation]\\n📸 Photo: [which photo, full bleed, how to crop]\\n\\nSLIDE 2 — The Piece\\n[2 lines, poetic and precise about this specific product]\\n📸 Photo: [specific photo direction]\\n\\nSLIDE 3 — The Craft\\n[2 lines about the preservation process, elevated language]\\n📸 Photo: [macro or detail shot direction]\\n\\nSLIDE 4 — For Her\\n[2 lines — occasion or mood, aspirational]\\n📸 Photo: [specific photo direction]\\n\\nSLIDE 5 — Scarcity + CTA\\n[One-of-a-kind message. Link in bio. Max 2 lines.]\\n📸 Photo: [cleanest product shot, centered]",
-  "caption": "[Editorial body copy — 3 short paragraphs, no more than 150 words total. Start with an image or feeling, not a product description. End with 'Link in bio → Shop JulietShopp on Etsy'\\n\\n[blank line]\\n#botanicaljewelry #realjewelry #preservedflowers #resinjewelry #handmadejewelry #botanicalart #floraljewelry #slowfashion #artisanjewelry #uniquejewelry #giftforher #cottagecore #jewelrylovers #naturejewelry #etsyfinds]",
-  "hooks": "1. [Hook A — visual/sensory — makes viewer stop to look]\\n2. [Hook B — question or statement that creates desire]\\n3. [Hook C — scarcity or exclusivity angle, elegant not pushy]"
-}`;
+---
+🎬 REEL SCRIPT (22 seconds)
 
-  try {
-    const response = await fetch('/api/instagram', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
-    });
-    const data = await response.json();
-    const raw = (data.content || []).map(i => i.text || '').join('');
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
-    renderInstagramResult(parsed, l);
-  } catch (err) {
+SCENE 1 — Hook (0-2s)
+🎙 Voiceover: [one arresting line, max 8 words]
+📸 Photo: [which photo + exact direction: angle, crop, movement]
+🎬 Edit: [pacing note]
+
+SCENE 2 — Craft (3-8s)
+🎙 Voiceover: [what makes this piece]
+📸 Photo: [specific direction]
+🎬 Edit: [note]
+
+SCENE 3 — The Detail (9-13s)
+🎙 Voiceover: [the thing no one else offers]
+📸 Photo: [macro, texture, light direction]
+🎬 Edit: [note]
+
+SCENE 4 — Emotion (14-18s)
+🎙 Voiceover: [who this is for, without being generic]
+📸 Photo: [specific direction]
+🎬 Edit: [note]
+
+SCENE 5 — CTA (19-22s)
+🎙 Voiceover: [elegant scarcity, one-of-a-kind]
+📸 Photo: [specific direction]
+🎬 Edit: [text overlay note]
+
+---
+🖼 CAROUSEL (5 slides)
+
+SLIDE 1 — Cover
+Headline: [max 6 words, typographic, no punctuation]
+📸 Photo: [which photo, full bleed, how to crop]
+
+SLIDE 2 — The Piece
+Copy: [2 lines, poetic and precise]
+📸 Photo: [direction]
+
+SLIDE 3 — The Craft
+Copy: [2 lines about preservation, elevated language]
+📸 Photo: [macro or detail]
+
+SLIDE 4 — For Her
+Copy: [2 lines, occasion or mood, aspirational]
+📸 Photo: [direction]
+
+SLIDE 5 — CTA
+Copy: [scarcity + link in bio, max 2 lines]
+📸 Photo: [cleanest shot, centered]
+
+---
+✍️ CAPTION
+
+[3 short editorial paragraphs, max 150 words total. Start with an image or feeling, not a product description. End with: Link in bio → Shop JulietShopp on Etsy]
+
+#botanicaljewelry #realjewelry #preservedflowers #resinjewelry #handmadejewelry #botanicalart #floraljewelry #slowfashion #artisanjewelry #uniquejewelry #giftforher #cottagecore #jewelrylovers #naturejewelry #etsyfinds
+
+---
+🪝 HOOKS (3 options)
+
+1. [visual/sensory — makes viewer stop]
+2. [question or desire-driven]
+3. [scarcity/exclusivity, elegant not pushy]`;
+
+  const contentArea = document.getElementById('ig-panel-content');
+
+  navigator.clipboard.writeText(prompt).then(() => {
     contentArea.innerHTML =
-      '<div style="padding:14px;background:var(--red-dim);border-radius:8px;color:var(--red);font-size:12px;margin-bottom:10px">'+
-      '&#x26A0;&#xFE0F; Error: '+escHtml(err.message)+'<br><span style="font-size:10px;opacity:.7">Check Vercel logs or try again.</span></div>'+
-      '<button class="ig-main-btn" onclick="generateInstagramContent()">&#x21BA; Try Again</button>';
-  }
+      '<div style="text-align:center;padding:20px 10px">'+
+      '<div style="font-size:32px;margin-bottom:10px">✅</div>'+
+      '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Prompt copied!</div>'+
+      '<div style="font-size:11px;color:var(--text2);margin-bottom:18px;line-height:1.6">Claude.ai opens in a new tab.<br>Just <strong>Ctrl+V</strong> and Enter — done.</div>'+
+      '<a href="https://claude.ai/new" target="_blank" rel="noopener" style="display:block;padding:12px;border-radius:8px;background:linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045);color:#fff;font-weight:700;font-size:13px;text-align:center;text-decoration:none;margin-bottom:16px">Open Claude.ai →</a>'+
+      '<div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:left;font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:14px">'+
+      '<strong style="color:var(--text)">After Claude generates:</strong><br>'+
+      '1. Copy reel script + caption<br>'+
+      '2. Open Meta Business Suite below<br>'+
+      '3. Paste and schedule ✓</div>'+
+      '<div style="padding:10px;background:rgba(24,119,242,0.08);border:1px solid rgba(24,119,242,0.25);border-radius:10px">'+
+      '<div style="font-size:10px;color:#4a9eff;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📱 Ready to post?</div>'+
+      '<a href="https://business.facebook.com/latest/composer/" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:7px;background:#1877f2;color:#fff;font-size:11px;font-weight:700;text-decoration:none">Open Meta Business Suite →</a>'+
+      '</div>'+
+      '<button onclick="generateInstagramContent()" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:11px;cursor:pointer">↺ Copy prompt again</button>'+
+      '</div>';
+    window.open('https://claude.ai/new', '_blank');
+  }).catch(() => {
+    contentArea.innerHTML =
+      '<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Copy this and paste in <a href="https://claude.ai/new" target="_blank" style="color:#833ab4">claude.ai</a>:</div>'+
+      '<textarea style="width:100%;height:180px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-size:10px;resize:none;outline:none;line-height:1.5" readonly>'+escHtml(prompt)+'</textarea>'+
+      '<button onclick="navigator.clipboard.writeText(document.querySelector('#ig-panel-content textarea').value).then(()=>{this.innerHTML='✅ Copied!';window.open('https://claude.ai/new','_blank')})" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045);border:none;color:#fff;font-weight:700;font-size:12px;cursor:pointer">📋 Copy & Open Claude.ai</button>';
+  });
 }
-
 function renderInstagramResult(data, listing) {
   const area = document.getElementById('ig-panel-content');
   const title = listing.title || '';
